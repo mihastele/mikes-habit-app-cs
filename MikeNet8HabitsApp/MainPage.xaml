@@ -25,32 +25,33 @@
         <CollectionView Grid.Row="1" x:Name="HabitsCollection" Margin="10">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Padding="10" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                    <Grid Padding="10" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
 
                         <!--  Countable Habit Increment Button and Count Display  -->
-                        <!--  Countable Habit Increment Button and Count Display  -->
-                        <HorizontalStackLayout Grid.Column="0" Grid.ColumnSpan="2"
-                                               IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=TargetCount, Converter={StaticResource NullToBooleanConverter}}"
-                                               HorizontalOptions="End" VerticalOptions="Center">
+                        <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                                               HorizontalOptions="End" VerticalOptions="Center" Padding="5">
                             <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding IsCompleted}"
-                                      CheckedChanged="OnHabitCheckedChanged" HorizontalOptions="Center" />
-                            <StackLayout Grid.Row="1" Grid.Column="0" VerticalOptions="Center"
-                                         HorizontalOptions="Center">
-                                <Label Text="Done" FontSize="12" />
-                            </StackLayout>
-                            <Button Text="+" Clicked="OnIncrementCountClicked" WidthRequest="40" HeightRequest="40" />
-                            <Label Text="{Binding CurrentCount}" VerticalOptions="Center" HorizontalOptions="Center" />
+                                      CheckedChanged="OnHabitCheckedChanged" HorizontalOptions="Center"
+                                      VerticalOptions="Center" />
+                            <Label Text="Done" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" />
+                            <Button Margin="0 5 5 5" Text="+" Clicked="OnIncrementCountClicked" WidthRequest="40"
+                                    HeightRequest="40"
+                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=CurrentCount, Converter={StaticResource NullToBooleanConverter}}" />
+                            <Label Margin="5" Text="{Binding CurrentCount}" VerticalOptions="Center"
+                                   HorizontalOptions="Center"
+                                   IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=CurrentCount, Converter={StaticResource NullToBooleanConverter}}" />
+
+                            <Label Margin="5" Text="{Binding TargetCount}" VerticalOptions="Center"
+                                   HorizontalOptions="End" FontSize="14" TextColor="Orange"
+                                   IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=TargetCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
                         </HorizontalStackLayout>
 
-
-                        <StackLayout Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" VerticalOptions="Center">
+                        <StackLayout Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" VerticalOptions="Center" Padding="5">
                             <Label Text="{Binding Name}" FontSize="16" />
                             <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" />
                         </StackLayout>
 
 
-                        <!-- <Label Grid.Column="2" Grid.RowSpan="2" Text="{Binding Streak}" VerticalOptions="Center"  -->
-                        <!--        HorizontalOptions="End" FontSize="14" TextColor="Orange" IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=TargetCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}"/> -->
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
