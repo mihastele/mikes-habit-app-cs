@@ -25,33 +25,59 @@
         <CollectionView Grid.Row="1" x:Name="HabitsCollection" Margin="10">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Padding="10" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+                    <Grid Padding="10"
+                          RowDefinitions="Auto,*"
+                          ColumnDefinitions="*">
 
-                        <!--  Countable Habit Increment Button and Count Display  -->
-                        <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
-                                               HorizontalOptions="End" VerticalOptions="Center" Padding="5">
-                            <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding IsCompleted}"
-                                      CheckedChanged="OnHabitCheckedChanged" HorizontalOptions="Center"
-                                      VerticalOptions="Center" />
-                            <Label Text="Done" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" />
-                            <Button Margin="0 5 5 5" Text="+" Clicked="OnIncrementCountClicked" WidthRequest="40"
+                        <!-- Horizontal controls (check box, label, button, etc.) -->
+                        <HorizontalStackLayout Grid.Row="0"
+                                               Spacing="10"
+                                               Padding="5"
+                                               HorizontalOptions="Start"
+                                               VerticalOptions="Center">
+                            <CheckBox IsChecked="{Binding IsCompleted}"
+                                      VerticalOptions="Center"
+                                      CheckedChanged="OnHabitCheckedChanged" />
+                            <Label Text="Done"
+                                   FontSize="12"
+                                   VerticalOptions="Center" />
+
+                            <Button Text="+"
+                                    WidthRequest="40"
                                     HeightRequest="40"
-                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=CurrentCount, Converter={StaticResource NullToBooleanConverter}}" />
-                            <Label Margin="5" Text="{Binding CurrentCount}" VerticalOptions="Center"
-                                   HorizontalOptions="Center"
-                                   IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=CurrentCount, Converter={StaticResource NullToBooleanConverter}}" />
+                                    Margin="0,0,5,0"
+                                    Clicked="OnIncrementCountClicked"
+                                    IsVisible="{Binding CurrentCount, Converter={StaticResource NullToBooleanConverter}}" />
 
-                            <Label Margin="5" Text="{Binding TargetCount}" VerticalOptions="Center"
-                                   HorizontalOptions="End" FontSize="14" TextColor="Orange"
-                                   IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=TargetCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
+                            <Label Text="{Binding CurrentCount}"
+                                   VerticalOptions="Center"
+                                   IsVisible="{Binding CurrentCount, Converter={StaticResource NullToBooleanConverter}}" />
+
+                            <Label Text="{Binding TargetCount}"
+                                   FontSize="14"
+                                   TextColor="Orange"
+                                   VerticalOptions="Center"
+                                   IsVisible="{Binding TargetCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
                         </HorizontalStackLayout>
 
-                        <StackLayout Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" VerticalOptions="Center" Padding="5">
-                            <Label Text="{Binding Name}" FontSize="16" />
-                            <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" />
-                        </StackLayout>
+                        <!-- Main habit information area -->
+                        <Frame Grid.Row="1"
+                               CornerRadius="8"
+                               Padding="10"
+                               HasShadow="True"
+                               BackgroundColor="White">
+                            <StackLayout Spacing="5"
+                                         VerticalOptions="FillAndExpand">
+                                <Label Text="{Binding Name}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="#333" />
 
-
+                                <Label Text="{Binding Description}"
+                                       FontSize="14"
+                                       TextColor="#666" />
+                            </StackLayout>
+                        </Frame>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
