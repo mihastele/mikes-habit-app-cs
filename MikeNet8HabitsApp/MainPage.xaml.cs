@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using Microsoft.Maui.Controls;
+using MikeNet8HabitsApp.Classes;
 
 namespace MikeNet8HabitsApp
 {
@@ -59,11 +60,13 @@ namespace MikeNet8HabitsApp
             
             // Add sample habits with random completion status
             var random = new Random();
-            _habits.Add(new Habit { 
+            _habits.Add(new CountableHabit { 
                 Name = "Drink Water", 
                 Description = "8 glasses per day", 
                 Streak = 5,
-                IsCompleted = date < DateTime.Today && random.Next(2) == 0
+                IsCompleted = date < DateTime.Today && random.Next(2) == 0,
+                CurrentCount = random.Next(1, 9),
+                TargetCount = 10
             });
             _habits.Add(new Habit { 
                 Name = "Exercise", 
@@ -118,14 +121,5 @@ namespace MikeNet8HabitsApp
             DisplayAlert("Settings", "Navigate to Settings page", "OK");
             // In a real app: await Navigation.PushAsync(new SettingsPage());
         }
-    }
-    
-    // Simple Habit model class
-    public class Habit
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public int Streak { get; set; }
-        public bool IsCompleted { get; set; }
     }
 }
