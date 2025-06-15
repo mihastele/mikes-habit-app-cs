@@ -64,6 +64,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="home\user\RiderProjects\MikeNet8HabitsApp\MikeNet8HabitsApp\" />
       <Folder Include="Models\" />
       <Folder Include="Pages\" />
     </ItemGroup>
