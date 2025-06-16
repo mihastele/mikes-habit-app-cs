@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using Microsoft.Maui.Controls;
 using MikeNet8HabitsApp.Classes;
@@ -9,34 +9,24 @@ namespace MikeNet8HabitsApp
     {
         private DateTime _currentDate = DateTime.Today;
         private ObservableCollection<Habit> _habits;
+        private readonly Services.DatabaseService _db;
         private Random _random = new Random();
 
         public MainPage()
         {
             InitializeComponent();
 
-            // Initialize habits collection
+            _db = App.Current.Services.GetService<Services.DatabaseService>();
             _habits = new ObservableCollection<Habit>();
-
-            // Add some sample habits for demonstration
-            _habits.Add(new Habit { Name = "Exercise", Description = "30 minutes", Streak = 3 });
-            _habits.Add(new Habit { Name = "Read", Description = "20 pages", Streak = 7 });
-            _habits.Add(new CountableHabit
-            {
-                Name = "Drink Water", Description = "6 glasses a day", Streak = 2, TargetCount = 6, CurrentCount = 0
-            });
-
-            // Set the collection as the source for the CollectionView
             HabitsCollection.ItemsSource = _habits;
 
-            // Update the date display
             UpdateDateDisplay();
         }
 
         private void UpdateDateDisplay()
         {
             string dateFormat = _currentDate.Date == DateTime.Today.Date
-                ? "Today, MMMM d"
+                ? $"Today, {_currentDate:MMMM d}"
                 : _currentDate.ToString("dddd, MMMM d");
             CurrentDateLabel.Text = dateFormat;
         }
@@ -57,14 +47,30 @@ namespace MikeNet8HabitsApp
             LoadHabitsForDate(_currentDate);
         }
 
-        private void LoadHabitsForDate(DateTime date)
+        private async Task LoadHabitsAsync()
         {
-            // In a real app, this would load habits from a database for the specified date
-            // For now, we'll just simulate it by clearing and re-adding items
+            var list = await _db.GetAllHabitsAsync();
             _habits.Clear();
+            foreach (var h in list)
+            {
+                _habits.Add(h);
+            }
+        }
 
-            // Add sample habits with random completion status
-            _habits.Add(new Habit
+        private async void LoadHabitsForDate(DateTime date)
+        {
+            // For this simple version, we ignore date filtering and just reload all habits.
+            await LoadHabitsAsync();
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            await LoadHabitsAsync();
+        }
+
+        // removed sample data section
+
             {
                 Name = "Exercise",
                 Description = "30 minutes",
@@ -89,23 +95,20 @@ namespace MikeNet8HabitsApp
             });
         }
 
-        private void OnHabitCheckedChanged(object sender, CheckedChangedEventArgs e)
+        private async void OnHabitCheckedChanged(object sender, CheckedChangedEventArgs e)
         {
             if (sender is CheckBox checkBox && checkBox.BindingContext is Habit habit)
             {
                 // Update the habit's completion status
                 habit.IsCompleted = e.Value;
 
-                // In a real app, you would save this change to a database
-                // SaveHabitCompletionStatus(habit, _currentDate, e.Value);
+                await _db.SaveHabitAsync(habit);
             }
         }
 
-        private void OnAddHabitClicked(object sender, EventArgs e)
+        private async void OnAddHabitClicked(object sender, EventArgs e)
         {
-            // Navigate to the Add Habit page
-            DisplayAlert("Add Habit", "Navigate to Add Habit page", "OK");
-            // In a real app: await Navigation.PushAsync(new AddHabitPage());
+            await Navigation.PushAsync(new Pages.AddHabitPage());
         }
 
         private void OnProgressClicked(object sender, EventArgs e)
@@ -129,7 +132,7 @@ namespace MikeNet8HabitsApp
             // In a real app: await Navigation.PushAsync(new SettingsPage());
         }
 
-        private void OnIncrementCountClicked(object sender, EventArgs e)
+        private async void OnIncrementCountClicked(object sender, EventArgs e)
         {
             if (sender is Button button && button.BindingContext is CountableHabit habit)
             {
@@ -139,9 +142,10 @@ namespace MikeNet8HabitsApp
                     habit.IsCompleted = true;
                 }
 
+                await _db.SaveHabitAsync(habit);
+
                 // Force UI refresh
-                HabitsCollection.ItemsSource = null;
-                HabitsCollection.ItemsSource = _habits;
+                await LoadHabitsAsync();
             }
         }
     }

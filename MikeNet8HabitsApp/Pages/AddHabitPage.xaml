@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MikeNet8HabitsApp.Pages.AddHabitPage"
+             Title="Add Habit">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            <Entry x:Name="NameEntry" Placeholder="Habit name"/>
+            <Entry x:Name="DescriptionEntry" Placeholder="Description"/>
+
+            <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                <Label Text="Countable" VerticalOptions="Center"/>
+                <Switch x:Name="CountableSwitch"/>
+            </HorizontalStackLayout>
+
+            <Entry x:Name="TargetCountEntry" Placeholder="Target count" Keyboard="Numeric" IsVisible="{Binding Source={x:Reference CountableSwitch}, Path=IsToggled}"/>
+
+            <Button Text="Save" Clicked="OnSaveClicked" BackgroundColor="#4CAF50" TextColor="White"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -6,9 +6,6 @@
              x:Class="MikeNet8HabitsApp.MainPage"
              xmlns:classes="clr-namespace:MikeNet8HabitsApp.Classes"
              Title="Habit Tracker">
-    <ContentPage.Resources>
-        <local:NullToBooleanConverter x:Key="NullToBooleanConverter" />
-    </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*,Auto">
         <!-- Header with Date Navigation -->
@@ -47,16 +44,16 @@
                                     HeightRequest="40"
                                     Margin="0,0,5,0"
                                     Clicked="OnIncrementCountClicked"
-                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=TargetCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
+                                    IsVisible="{Binding IsCountable}" />
                             <Label Text="{Binding CurrentCount}"
                                    VerticalOptions="Center"
-                                   IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=CurrentCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
+                                   IsVisible="{Binding IsCountable}" />
 
                             <Label Text="{Binding TargetCount}"
                                    FontSize="14"
                                    TextColor="Orange"
                                    VerticalOptions="Center"
-                                   IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=TargetCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
+                                   IsVisible="{Binding IsCountable}" />
                         </HorizontalStackLayout>
 
                         <!-- Main habit information area -->
