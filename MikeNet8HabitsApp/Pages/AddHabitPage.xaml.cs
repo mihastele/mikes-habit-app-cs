@@ -43,7 +43,7 @@ public partial class AddHabitPage : ContentPage
                 Description = description,
                 TargetCount = target,
                 CurrentCount = 0,
-                Color = Colors.LightGray,
+                ColorHex = Colors.LightGray.ToHex(),
                 Streak = 0
             };
         }
@@ -53,7 +53,7 @@ public partial class AddHabitPage : ContentPage
             {
                 Name = name,
                 Description = description,
-                Color = Colors.LightGray,
+                ColorHex = Colors.LightGray.ToHex(),
                 Streak = 0
             };
         }

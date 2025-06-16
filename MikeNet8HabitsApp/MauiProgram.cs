@@ -24,6 +24,8 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
 
-        return builder.Build();
+        var app = builder.Build();
+        var databaseService = app.Services.GetService<Services.DatabaseService>();
+        return app;
     }
 }

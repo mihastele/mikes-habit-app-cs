@@ -23,6 +23,7 @@ namespace MikeNet8HabitsApp
 
             UpdateDateDisplay();
         }
+        
 
         private void UpdateDateDisplay()
         {
@@ -67,6 +68,10 @@ namespace MikeNet8HabitsApp
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+            if(_db != null)
+            {
+                await _db.InitializeAsync();
+            }
             await LoadHabitsAsync();
         }
 

@@ -13,15 +13,23 @@ public class DatabaseService
 
     public DatabaseService()
     {
-        var dbPath = Path.Combine(FileSystem.AppDataDirectory, "habits.db3");
-        _connection = new SQLiteAsyncConnection(dbPath);
-        _ = InitializeAsync();
+        var databasePath = Path.Combine(FileSystem.AppDataDirectory, "habits.db3");
+        _connection = new SQLiteAsyncConnection(databasePath);
     }
 
-    private async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
+        // Drop existing tables to handle schema changes
+        await _connection.DropTableAsync<Habit>();
+        await _connection.DropTableAsync<CountableHabit>();
+        
+        // Create new tables with updated schema
         await _connection.CreateTableAsync<Habit>();
         await _connection.CreateTableAsync<CountableHabit>();
+        
+        // For debugging: Verify tables were created
+        var tableInfo = await _connection.GetTableInfoAsync("Habit");
+        System.Diagnostics.Debug.WriteLine($"Habit table created with {tableInfo.Count} columns");
     }
 
     // Returns all habits (including countable ones) ordered by Id.
