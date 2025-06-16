@@ -2,6 +2,8 @@ using System;
 using System.Collections.ObjectModel;
 using Microsoft.Maui.Controls;
 using MikeNet8HabitsApp.Classes;
+using MikeNet8HabitsApp.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MikeNet8HabitsApp
 {
@@ -10,13 +12,12 @@ namespace MikeNet8HabitsApp
         private DateTime _currentDate = DateTime.Today;
         private ObservableCollection<Habit> _habits;
         private readonly Services.DatabaseService _db;
-        private Random _random = new Random();
 
         public MainPage()
         {
             InitializeComponent();
 
-            _db = App.Current.Services.GetService<Services.DatabaseService>();
+            _db = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
             _habits = new ObservableCollection<Habit>();
             HabitsCollection.ItemsSource = _habits;
 
@@ -67,32 +68,6 @@ namespace MikeNet8HabitsApp
         {
             base.OnAppearing();
             await LoadHabitsAsync();
-        }
-
-        // removed sample data section
-
-            {
-                Name = "Exercise",
-                Description = "30 minutes",
-                Streak = 3,
-                IsCompleted = date < DateTime.Today && _random.Next(2) == 0
-            });
-            _habits.Add(new Habit
-            {
-                Name = "Read",
-                Description = "20 pages",
-                Streak = 7,
-                IsCompleted = date < DateTime.Today && _random.Next(2) == 0
-            });
-            _habits.Add(new CountableHabit
-            {
-                Name = "Drink Water",
-                Description = "6 glasses a day",
-                Streak = 2,
-                TargetCount = 6,
-                CurrentCount = _random.Next(6),
-                IsCompleted = date < DateTime.Today && _random.Next(2) == 0
-            });
         }
 
         private async void OnHabitCheckedChanged(object sender, CheckedChangedEventArgs e)
