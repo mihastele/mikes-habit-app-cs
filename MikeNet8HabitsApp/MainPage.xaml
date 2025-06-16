@@ -47,17 +47,16 @@
                                     HeightRequest="40"
                                     Margin="0,0,5,0"
                                     Clicked="OnIncrementCountClicked"
-                                    IsVisible="{Binding CurrentCount, Converter={StaticResource NullToBooleanConverter}}" />
-
+                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=TargetCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
                             <Label Text="{Binding CurrentCount}"
                                    VerticalOptions="Center"
-                                   IsVisible="{Binding CurrentCount, Converter={StaticResource NullToBooleanConverter}}" />
+                                   IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=CurrentCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
 
                             <Label Text="{Binding TargetCount}"
                                    FontSize="14"
                                    TextColor="Orange"
                                    VerticalOptions="Center"
-                                   IsVisible="{Binding TargetCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
+                                   IsVisible="{Binding Source={RelativeSource AncestorType={x:Type classes:CountableHabit}}, Path=TargetCount, Converter={StaticResource NullToBooleanConverter}, ConverterParameter=true}" />
                         </HorizontalStackLayout>
 
                         <!-- Main habit information area -->
