@@ -84,7 +84,9 @@ public partial class AddHabitPage : ContentPage
             }
 
 
+            Debug.WriteLine($"Attempting to save habit: {habit.Name}");
             await _db.SaveHabitAsync(habit);
+            Debug.WriteLine($"Habit saved successfully: {habit.Name}");
             await Navigation.PopAsync();
         }
         catch (Exception ex)
