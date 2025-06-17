@@ -19,17 +19,13 @@ public class DatabaseService
 
     public async Task InitializeAsync()
     {
-        // Drop existing tables to handle schema changes
-        await _connection.DropTableAsync<Habit>();
-        await _connection.DropTableAsync<CountableHabit>();
-        
-        // Create new tables with updated schema
+        // Create new tables with updated schema if they do not exist
         await _connection.CreateTableAsync<Habit>();
         await _connection.CreateTableAsync<CountableHabit>();
         
-        // For debugging: Verify tables were created
+        // For debugging: Verify tables were ensured
         var tableInfo = await _connection.GetTableInfoAsync("Habit");
-        System.Diagnostics.Debug.WriteLine($"Habit table created with {tableInfo.Count} columns");
+        System.Diagnostics.Debug.WriteLine($"Habit table ensured with {tableInfo.Count} columns");
     }
 
     // Returns all habits (including countable ones) ordered by Id.
