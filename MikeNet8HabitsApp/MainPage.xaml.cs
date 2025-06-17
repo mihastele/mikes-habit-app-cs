@@ -81,8 +81,14 @@ namespace MikeNet8HabitsApp
             {
                 // Update the habit's completion status
                 habit.IsCompleted = e.Value;
-
+                if (habit is CountableHabit countableHabit && !e.Value)
+                {
+                    countableHabit.CurrentCount = 0;
+                }
                 await _db.SaveHabitAsync(habit);
+                var record = new HabitRecord { HabitId = habit.Id, Date = _currentDate, IsCompleted = habit.IsCompleted };
+                await _db.SaveHabitRecordAsync(record);
+                await LoadHabitsAsync();  // Added to refresh UI after change
             }
         }
 
@@ -123,9 +129,24 @@ namespace MikeNet8HabitsApp
                 }
 
                 await _db.SaveHabitAsync(habit);
+                var recordIncrement = new HabitRecord { HabitId = habit.Id, Date = _currentDate, IsCompleted = habit.IsCompleted };
+                await _db.SaveHabitRecordAsync(recordIncrement);
 
                 // Force UI refresh
                 await LoadHabitsAsync();
+            }
+        }
+
+        private async void OnDeleteHabitClicked(object sender, EventArgs e)
+        {
+            if (sender is Button button && button.BindingContext is Habit habit)
+            {
+                var confirm = await DisplayAlert("Confirm Deletion", $"Are you sure you want to delete '{habit.Name}'?", "Yes", "No");
+                if (confirm)
+                {
+                    await _db.DeleteHabitAsync(habit.Id);
+                    await LoadHabitsAsync();  // Refresh the list after deletion
+                }
             }
         }
     }

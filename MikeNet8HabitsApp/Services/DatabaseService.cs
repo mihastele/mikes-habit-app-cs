@@ -22,6 +22,7 @@ public class DatabaseService
         // Create new tables with updated schema if they do not exist
         await _connection.CreateTableAsync<Habit>();
         await _connection.CreateTableAsync<CountableHabit>();
+        await _connection.CreateTableAsync<HabitRecord>();
         
         // For debugging: Verify tables were ensured
         var tableInfo = await _connection.GetTableInfoAsync("Habit");
@@ -49,6 +50,28 @@ public class DatabaseService
             return await UpdateOrInsertCountableHabitAsync(countable);
         }
         return await UpdateOrInsertHabitAsync(habit);
+    }
+
+    public async Task SaveHabitRecordAsync(HabitRecord record)
+    {
+        await _connection.InsertOrReplaceAsync(record);
+    }
+
+    public async Task DeleteHabitAsync(int id)
+    {
+        var habit = await _connection.FindAsync<Habit>(id);
+        if (habit != null)
+        {
+            await _connection.DeleteAsync(habit);
+        }
+        else
+        {
+            var countableHabit = await _connection.FindAsync<CountableHabit>(id);
+            if (countableHabit != null)
+            {
+                await _connection.DeleteAsync(countableHabit);
+            }
+        }
     }
 
     private async Task<int> UpdateOrInsertCountableHabitAsync(CountableHabit countable)
