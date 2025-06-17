@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<ContentPage x:Name="Page"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MikeNet8HabitsApp"
              x:Class="MikeNet8HabitsApp.MainPage"
@@ -40,10 +41,12 @@
                                    VerticalOptions="Center" />
 
                             <Button Text="+"
+                                    x:Name="IncrementButton"
                                     WidthRequest="40"
                                     HeightRequest="40"
                                     Margin="0,0,5,0"
-                                    Clicked="OnIncrementCountClicked"
+                                    Command="{Binding Source={x:Reference Page}, Path=BindingContext.IncrementCountCommand}"
+                                    CommandParameter="{Binding}"
                                     IsVisible="{Binding IsCountable}" />
                             <Label Text="{Binding CurrentCount}"
                                    VerticalOptions="Center"
@@ -86,15 +89,85 @@
         </CollectionView>
 
         <!-- Footer with Navigation Buttons -->
-        <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*" Padding="10" BackgroundColor="#f0f0f0">
-            <Button Grid.Column="0" Text="Add" Clicked="OnAddHabitClicked"
-                    BackgroundColor="#4CAF50" TextColor="White" />
-            <Button Grid.Column="1" Text="Progress" Clicked="OnProgressClicked"
-                    BackgroundColor="#2196F3" TextColor="White" />
-            <Button Grid.Column="2" Text="Calendar" Clicked="OnCalendarClicked"
-                    BackgroundColor="#FF9800" TextColor="White" />
-            <Button Grid.Column="3" Text="Settings" Clicked="OnSettingsClicked"
-                    BackgroundColor="#9E9E9E" TextColor="White" />
+        <Grid Grid.Row="2" ColumnSpacing="10" Padding="15,10" BackgroundColor="#f0f0f0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" 
+                    Clicked="OnAddHabitClicked"
+                    BackgroundColor="#4CAF50"
+                    CornerRadius="20"
+                    WidthRequest="60"
+                    HeightRequest="60">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="+"
+                                   FontFamily="MaterialDesignIcons"
+                                   Color="White"
+                                   Size="24" />
+                </Button.ImageSource>
+                <Button.SemanticProperties Hint="Add new habit" />
+            </Button>
+            
+            <Button Grid.Column="1" 
+                    Clicked="OnProgressClicked"
+                    BackgroundColor="#2196F3"
+                    CornerRadius="20"
+                    WidthRequest="60"
+                    HeightRequest="60">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="📊"
+                                   Color="White"
+                                   Size="24" />
+                </Button.ImageSource>
+                <Button.SemanticProperties Hint="View progress" />
+            </Button>
+            
+            <Button Grid.Column="2" 
+                    Clicked="OnCalendarClicked"
+                    BackgroundColor="#FF9800"
+                    CornerRadius="20"
+                    WidthRequest="60"
+                    HeightRequest="60">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="📅"
+                                   Color="White"
+                                   Size="24" />
+                </Button.ImageSource>
+                <Button.SemanticProperties Hint="View calendar" />
+            </Button>
+            
+            <Button Grid.Column="3" 
+                    Clicked="OnSettingsClicked"
+                    BackgroundColor="#9E9E9E"
+                    CornerRadius="20"
+                    WidthRequest="60"
+                    HeightRequest="60">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="⚙"
+                                   Color="White"
+                                   Size="24" />
+                </Button.ImageSource>
+                <Button.SemanticProperties Hint="Open settings" />
+            </Button>
+            
+            <!-- <Button Grid.Column="4"  -->
+            <!--         Clicked="OnDebugClicked" -->
+            <!--         BackgroundColor="#9C27B0" -->
+            <!--         CornerRadius="20" -->
+            <!--         WidthRequest="60" -->
+            <!--         HeightRequest="60" -->
+            <!--         Margin="10,0,0,0"> -->
+            <!--     <Button.ImageSource> -->
+            <!--         <FontImageSource Glyph="🐞" -->
+            <!--                        Color="White" -->
+            <!--                        Size="24" /> -->
+            <!--     </Button.ImageSource> -->
+            <!--     <Button.SemanticProperties Hint="Open debug tools" /> -->
+            <!-- </Button> -->
         </Grid>
     </Grid>
 </ContentPage>

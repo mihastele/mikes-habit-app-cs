@@ -15,7 +15,20 @@
 
             <Entry x:Name="TargetCountEntry" Placeholder="Target count" Keyboard="Numeric" IsVisible="{Binding Source={x:Reference CountableSwitch}, Path=IsToggled}"/>
 
-            <Button Text="Save" Clicked="OnSaveClicked" BackgroundColor="#4CAF50" TextColor="White"/>
+            <Button Clicked="OnSaveClicked" 
+                    BackgroundColor="#4CAF50" 
+                    CornerRadius="25"
+                    HeightRequest="50"
+                    Margin="0,10"
+                    SemanticProperties.Hint="Save habit">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="✓"
+                                   FontFamily="MaterialDesignIcons"
+                                   Color="White"
+                                   Size="24" />
+                </Button.ImageSource>
+                <Button.SemanticProperties Hint="Save habit" />
+            </Button>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
