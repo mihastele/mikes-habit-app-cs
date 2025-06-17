@@ -50,11 +50,20 @@ public class DatabaseService
     {
         if (habit is CountableHabit countable)
         {
-            if (countable.Id != 0)
-                return await _connection.UpdateAsync(countable);
-            return await _connection.InsertAsync(countable);
+            return await UpdateOrInsertCountableHabitAsync(countable);
         }
+        return await UpdateOrInsertHabitAsync(habit);
+    }
 
+    private async Task<int> UpdateOrInsertCountableHabitAsync(CountableHabit countable)
+    {
+        if (countable.Id != 0)
+            return await _connection.UpdateAsync(countable);
+        return await _connection.InsertAsync(countable);
+    }
+
+    private async Task<int> UpdateOrInsertHabitAsync(Habit habit)
+    {
         if (habit.Id != 0)
             return await _connection.UpdateAsync(habit);
         return await _connection.InsertAsync(habit);
