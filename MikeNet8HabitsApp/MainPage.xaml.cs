@@ -61,8 +61,12 @@ namespace MikeNet8HabitsApp
 
         private async void LoadHabitsForDate(DateTime date)
         {
-            // For this simple version, we ignore date filtering and just reload all habits.
-            await LoadHabitsAsync();
+            await LoadHabitsAsync(); // Load all habits first
+            foreach (var habit in _habits)
+            {
+                var record = await _db.GetHabitRecordAsync(habit.Id, date);
+                habit.IsCompleted = record?.IsCompleted ?? false; // Set IsCompleted from HabitRecord or default to false
+            }
         }
 
         protected override async void OnAppearing()
@@ -79,16 +83,24 @@ namespace MikeNet8HabitsApp
         {
             if (sender is CheckBox checkBox && checkBox.BindingContext is Habit habit)
             {
-                // Update the habit's completion status
                 habit.IsCompleted = e.Value;
                 if (habit is CountableHabit countableHabit && !e.Value)
                 {
                     countableHabit.CurrentCount = 0;
                 }
                 await _db.SaveHabitAsync(habit);
-                var record = new HabitRecord { HabitId = habit.Id, Date = _currentDate, IsCompleted = habit.IsCompleted };
-                await _db.SaveHabitRecordAsync(record);
-                await LoadHabitsAsync();  // Added to refresh UI after change
+                var record = await _db.GetHabitRecordAsync(habit.Id, _currentDate);
+                if (record == null)
+                {
+                    record = new HabitRecord { HabitId = habit.Id, Date = _currentDate, IsCompleted = habit.IsCompleted };
+                    await _db.SaveHabitRecordAsync(record);
+                }
+                else
+                {
+                    record.IsCompleted = habit.IsCompleted;
+                    await _db.SaveHabitRecordAsync(record);
+                }
+                await LoadHabitsAsync();  // Refresh UI
             }
         }
 
@@ -97,11 +109,9 @@ namespace MikeNet8HabitsApp
             await Navigation.PushAsync(new Pages.AddHabitPage());
         }
 
-        private void OnProgressClicked(object sender, EventArgs e)
+        private async void OnProgressClicked(object sender, EventArgs e)
         {
-            // Navigate to the Progress page
-            DisplayAlert("Progress", "Navigate to Progress page", "OK");
-            // In a real app: await Navigation.PushAsync(new ProgressPage());
+            await Navigation.PushAsync(new Pages.HabitPerformancePage());
         }
 
         private void OnCalendarClicked(object sender, EventArgs e)
@@ -127,13 +137,19 @@ namespace MikeNet8HabitsApp
                 {
                     habit.IsCompleted = true;
                 }
-
                 await _db.SaveHabitAsync(habit);
-                var recordIncrement = new HabitRecord { HabitId = habit.Id, Date = _currentDate, IsCompleted = habit.IsCompleted };
-                await _db.SaveHabitRecordAsync(recordIncrement);
-
-                // Force UI refresh
-                await LoadHabitsAsync();
+                var record = await _db.GetHabitRecordAsync(habit.Id, _currentDate);
+                if (record == null)
+                {
+                    record = new HabitRecord { HabitId = habit.Id, Date = _currentDate, IsCompleted = habit.IsCompleted };
+                    await _db.SaveHabitRecordAsync(record);
+                }
+                else
+                {
+                    record.IsCompleted = habit.IsCompleted;  // Update existing record
+                    await _db.SaveHabitRecordAsync(record);
+                }
+                await LoadHabitsAsync();  // Refresh UI
             }
         }
 

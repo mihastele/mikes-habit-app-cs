@@ -10,4 +10,6 @@ public interface IDatabaseService
     Task<List<Habit>> GetAllHabitsAsync();
     Task<int> SaveHabitAsync(Habit habit);
     Task ResetDatabaseAsync();
+    Task<HabitRecord> GetHabitRecordAsync(int habitId, DateTime date);
+    Task<List<HabitRecord>> GetAllHabitRecordsForHabitAsync(int habitId);
 }

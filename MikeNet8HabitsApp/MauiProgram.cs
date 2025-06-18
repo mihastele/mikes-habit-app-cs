@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MikeNet8HabitsApp.ViewModels;
 
 namespace MikeNet8HabitsApp;
 
@@ -17,6 +18,7 @@ public static class MauiProgram
             });
 
         builder.Services.AddSingleton<Services.DatabaseService>();
+        builder.Services.AddSingleton<HabitPerformanceViewModel>();
         builder.Services.AddTransient<Pages.AddHabitPage>();
         builder.Services.AddTransient<MainPage>();
 

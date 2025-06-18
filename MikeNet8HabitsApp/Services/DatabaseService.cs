@@ -74,6 +74,16 @@ public class DatabaseService
         }
     }
 
+    public async Task<HabitRecord> GetHabitRecordAsync(int habitId, DateTime date)
+    {
+        return await _connection.Table<HabitRecord>().Where(r => r.HabitId == habitId && r.Date.Date == date.Date).FirstOrDefaultAsync();
+    }
+
+    public async Task<List<HabitRecord>> GetAllHabitRecordsForHabitAsync(int habitId)
+    {
+        return await _connection.Table<HabitRecord>().Where(r => r.HabitId == habitId).ToListAsync();
+    }
+
     private async Task<int> UpdateOrInsertCountableHabitAsync(CountableHabit countable)
     {
         if (countable.Id != 0)
