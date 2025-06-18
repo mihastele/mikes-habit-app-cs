@@ -76,7 +76,15 @@ public class DatabaseService
 
     public async Task<HabitRecord> GetHabitRecordAsync(int habitId, DateTime date)
     {
-        return await _connection.Table<HabitRecord>().Where(r => r.HabitId == habitId && r.Date.Date == date.Date).FirstOrDefaultAsync();
+        // Convert date to start and end of day for proper range comparison
+        var startOfDay = date.Date;
+        var endOfDay = startOfDay.AddDays(1);
+        
+        return await _connection.Table<HabitRecord>()
+            .Where(r => r.HabitId == habitId && 
+                        r.Date >= startOfDay && 
+                        r.Date < endOfDay)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<List<HabitRecord>> GetAllHabitRecordsForHabitAsync(int habitId)
