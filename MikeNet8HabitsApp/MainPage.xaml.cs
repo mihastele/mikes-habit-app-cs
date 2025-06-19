@@ -58,6 +58,16 @@ namespace MikeNet8HabitsApp
                 _habits.Add(h);
             }
         }
+        
+        // private void UpdateHabitsList(List<Habit> list)
+        // {
+        //     // var list = await _db.GetAllHabitsAsync();
+        //     _habits.Clear();
+        //     foreach (var h in list)
+        //     {
+        //         _habits.Add(h);
+        //     }
+        // }
 
         private async void LoadHabitsForDate(DateTime date)
         {
@@ -65,8 +75,10 @@ namespace MikeNet8HabitsApp
             foreach (var habit in _habits)
             {
                 var record = await _db.GetHabitRecordAsync(habit.Id, date);
+                DisplayAlert("Record", record?.Id + " " + record?.Date + " " + record?.IsCompleted, "OK");
                 habit.IsCompleted = record?.IsCompleted ?? false; // Set IsCompleted from HabitRecord or default to false
             }
+            // UpdateHabitsList(_habits); // Load all habits first
         }
 
         protected override async void OnAppearing()
