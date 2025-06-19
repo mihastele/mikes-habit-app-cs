@@ -19,7 +19,6 @@ public class DatabaseService
 
     public async Task InitializeAsync()
     {
-        
         // Drop existing tables to handle schema changes
         // await _connection.DropTableAsync<Habit>();
         // await _connection.DropTableAsync<CountableHabit>();
@@ -57,11 +56,50 @@ public class DatabaseService
         }
         return await UpdateOrInsertHabitAsync(habit);
     }
-
-    public async Task SaveHabitRecordAsync(HabitRecord record)
+    
+    public async Task<HabitRecord> GetHabitRecordAsync(int habitId, DateTime date)
     {
-        await _connection.InsertOrReplaceAsync(record);
+        // Ensure we're only comparing the date part
+        var dateOnly = date.Date;
+    
+        // Query using exact date match
+        return await _connection.Table<HabitRecord>()
+            .Where(r => r.HabitId == habitId && r.Date == dateOnly)
+            .FirstOrDefaultAsync();
     }
+
+    public async Task<int> SaveHabitRecordAsync(HabitRecord record)
+    {
+        // Ensure we only store the date part
+        record.Date = record.Date.Date;
+    
+        // Check if a record already exists for this habit and date
+        var existingRecord = await GetHabitRecordAsync(record.HabitId, record.Date);
+    
+        if (existingRecord != null)
+        {
+            // Update existing record
+            record.Id = existingRecord.Id;  // Ensure we're updating the correct record
+            return await _connection.UpdateAsync(record);
+        }
+        else
+        {
+            // Insert new record
+            return await _connection.InsertAsync(record);
+        }
+    }
+    
+    // public async Task<int> SaveHabitRecordAsync(HabitRecord record)
+    // {
+    //     // Ensure we only store the date part
+    //     record.Date = record.Date.Date;
+    //     return await _connection.InsertOrReplaceAsync(record);
+    // }
+
+    // public async Task SaveHabitRecordAsync(HabitRecord record)
+    // {
+    //     await _connection.InsertOrReplaceAsync(record);
+    // }
 
     public async Task DeleteHabitAsync(int id)
     {
@@ -80,17 +118,20 @@ public class DatabaseService
         }
     }
 
-    public async Task<HabitRecord> GetHabitRecordAsync(int habitId, DateTime date)
-    {
-        // Format the date as yyyy-MM-dd string for comparison
-        var dateString = date.ToString("yyyy-MM-dd");
-        
-        // Query using the string-based DateString property
-        return await _connection.Table<HabitRecord>()
-            .Where(r => r.HabitId == habitId && r.DateString == dateString)
-            .FirstOrDefaultAsync();
-    }
-    
+    // public async Task<HabitRecord> GetHabitRecordAsync(int habitId, DateTime date)
+    // {
+    //     // Ensure we're only comparing the date part
+    //     var dateOnly = date.Date;
+    //     var nextDay = dateOnly.AddDays(1);
+    //     
+    //     // Query using date range to match the day
+    //     return await _connection.Table<HabitRecord>()
+    //         .Where(r => r.HabitId == habitId && 
+    //                   r.Date >= dateOnly && 
+    //                   r.Date < nextDay)
+    //         .FirstOrDefaultAsync();
+    // }
+    //
     public async Task<List<HabitRecord>> GetHabitRecordsForHabitId(int habitId)
     {
         // Query using the string-based DateString property
