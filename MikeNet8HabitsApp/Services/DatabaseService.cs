@@ -91,6 +91,13 @@ public class DatabaseService
             .FirstOrDefaultAsync();
     }
     
+    public async Task<List<HabitRecord>> GetHabitRecordsForHabitId(int habitId)
+    {
+        // Query using the string-based DateString property
+        return await _connection.Table<HabitRecord>()
+            .Where(r => r.HabitId == habitId).ToListAsync();
+    }
+    
     public async Task<HabitRecord> DebugHabitRecordAsync()
     {
         return await _connection.Table<HabitRecord>().FirstOrDefaultAsync();

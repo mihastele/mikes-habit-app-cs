@@ -12,6 +12,7 @@ namespace MikeNet8HabitsApp
         private DateTime _currentDate = DateTime.Today;
         private ObservableCollection<Habit> _habits;
         private readonly Services.DatabaseService _db;
+        private bool _isLoadingHabits = false;
 
         public MainPage()
         {
@@ -71,16 +72,33 @@ namespace MikeNet8HabitsApp
 
         private async void LoadHabitsForDate(DateTime date)
         {
-            await LoadHabitsAsync(); // Load all habits first
-            foreach (var habit in _habits)
+            _isLoadingHabits = true; // Set flag to ignore checkbox changes
+            try
             {
-                var record = await _db.GetHabitRecordAsync(habit.Id, date);
-                var firstRecord = await _db.DebugHabitRecordAsync();
-                DisplayAlert("Record", record?.Id + " " + record?.Date + " " + record?.IsCompleted, "OK");
-                DisplayAlert("Record present?", firstRecord?.Id + " " + firstRecord?.HabitId + " " + firstRecord?.Date + " " + firstRecord?.IsCompleted, "OK");
-                habit.IsCompleted = record?.IsCompleted ?? false; // Set IsCompleted from HabitRecord or default to false
+                await LoadHabitsAsync(); // Load all habits first
+                foreach (var habit in _habits)
+                {
+                    var record = await _db.GetHabitRecordAsync(habit.Id, date);
+                    var firstRecord = await _db.DebugHabitRecordAsync();
+                    // DisplayAlert("Record", record?.Id + " " + record?.Date + " " + record?.IsCompleted, "OK");
+                    // DisplayAlert("Record present?", firstRecord?.Id + " " + firstRecord?.HabitId + " " + firstRecord?.Date + " " + firstRecord?.IsCompleted, "OK");
+                    habit.IsCompleted = record?.IsCompleted ?? false; // Set IsCompleted from HabitRecord or default to false
+                }
             }
-            // UpdateHabitsList(_habits); // Load all habits first
+            finally
+            {
+                _isLoadingHabits = false; // Reset flag when done
+            }
+            // await LoadHabitsAsync(); // Load all habits first
+            // foreach (var habit in _habits)
+            // {
+            //     var record = await _db.GetHabitRecordAsync(habit.Id, date);
+            //     var firstRecord = await _db.DebugHabitRecordAsync();
+            //     DisplayAlert("Record", record?.Id + " " + record?.Date + " " + record?.IsCompleted, "OK");
+            //     DisplayAlert("Record present?", firstRecord?.Id + " " + firstRecord?.HabitId + " " + firstRecord?.Date + " " + firstRecord?.IsCompleted, "OK");
+            //     habit.IsCompleted = record?.IsCompleted ?? false; // Set IsCompleted from HabitRecord or default to false
+            // }
+            // // UpdateHabitsList(_habits); // Load all habits first
         }
 
         protected override async void OnAppearing()
@@ -95,6 +113,9 @@ namespace MikeNet8HabitsApp
 
         private async void OnHabitCheckedChanged(object sender, CheckedChangedEventArgs e)
         {
+            if (_isLoadingHabits) // Skip processing if we're just loading habits
+                return;
+            
             if (sender is CheckBox checkBox && checkBox.BindingContext is Habit habit)
             {
                 habit.IsCompleted = e.Value;
