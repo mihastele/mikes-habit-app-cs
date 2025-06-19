@@ -19,6 +19,12 @@ public class DatabaseService
 
     public async Task InitializeAsync()
     {
+        
+        // Drop existing tables to handle schema changes
+        // await _connection.DropTableAsync<Habit>();
+        // await _connection.DropTableAsync<CountableHabit>();
+        // await _connection.DropTableAsync<HabitRecord>();
+        
         // Create new tables with updated schema if they do not exist
         await _connection.CreateTableAsync<Habit>();
         await _connection.CreateTableAsync<CountableHabit>();
@@ -76,15 +82,18 @@ public class DatabaseService
 
     public async Task<HabitRecord> GetHabitRecordAsync(int habitId, DateTime date)
     {
-        // Convert date to start and end of day for proper range comparison
-        var startOfDay = date.Date;
-        var endOfDay = startOfDay.AddDays(1);
+        // Format the date as yyyy-MM-dd string for comparison
+        var dateString = date.ToString("yyyy-MM-dd");
         
+        // Query using the string-based DateString property
         return await _connection.Table<HabitRecord>()
-            .Where(r => r.HabitId == habitId && 
-                        r.Date >= startOfDay && 
-                        r.Date < endOfDay)
+            .Where(r => r.HabitId == habitId && r.DateString == dateString)
             .FirstOrDefaultAsync();
+    }
+    
+    public async Task<HabitRecord> DebugHabitRecordAsync()
+    {
+        return await _connection.Table<HabitRecord>().FirstOrDefaultAsync();
     }
 
     public async Task<List<HabitRecord>> GetAllHabitRecordsForHabitAsync(int habitId)

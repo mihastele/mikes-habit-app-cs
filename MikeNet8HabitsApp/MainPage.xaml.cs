@@ -16,11 +16,11 @@ namespace MikeNet8HabitsApp
         public MainPage()
         {
             InitializeComponent();
-
             _db = App.Current?.Handler?.MauiContext?.Services.GetService<Services.DatabaseService>();
             _habits = new ObservableCollection<Habit>();
             HabitsCollection.ItemsSource = _habits;
-
+            
+            LoadHabitsForDate(_currentDate);
             UpdateDateDisplay();
         }
         
@@ -75,7 +75,9 @@ namespace MikeNet8HabitsApp
             foreach (var habit in _habits)
             {
                 var record = await _db.GetHabitRecordAsync(habit.Id, date);
+                var firstRecord = await _db.DebugHabitRecordAsync();
                 DisplayAlert("Record", record?.Id + " " + record?.Date + " " + record?.IsCompleted, "OK");
+                DisplayAlert("Record present?", firstRecord?.Id + " " + firstRecord?.HabitId + " " + firstRecord?.Date + " " + firstRecord?.IsCompleted, "OK");
                 habit.IsCompleted = record?.IsCompleted ?? false; // Set IsCompleted from HabitRecord or default to false
             }
             // UpdateHabitsList(_habits); // Load all habits first
@@ -160,7 +162,12 @@ namespace MikeNet8HabitsApp
             var record = await _db.GetHabitRecordAsync(habit.Id, _currentDate);
             if (record == null)
             {
-                record = new HabitRecord { HabitId = habit.Id, Date = _currentDate, IsCompleted = habit.IsCompleted };
+                record = new HabitRecord 
+                { 
+                    HabitId = habit.Id, 
+                    Date = _currentDate, 
+                    IsCompleted = habit.IsCompleted 
+                };
                 await _db.SaveHabitRecordAsync(record);
             }
             else
