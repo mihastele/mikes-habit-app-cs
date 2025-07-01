@@ -10,15 +10,23 @@
     </ContentPage.Resources>
     
     <Grid Padding="10">
-        <CollectionView ItemsSource="{Binding Days}" x:Name="CalendarCollection" ItemsLayout="{StaticResource CalendarGrid}">
-            
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="vm:CalendarDay">
-                    <Frame CornerRadius="4" Padding="4" BackgroundColor="{Binding BgColor}">
-                        <Label Text="{Binding DisplayText}" HorizontalOptions="Center" />
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+        <ScrollView>
+            <StackLayout>
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,10">
+                    <Button Text="◀" Clicked="PrevMonth_Clicked" />
+                    <Label Text="{Binding MonthTitle}" FontSize="18" HorizontalOptions="Center" Grid.Column="1" />
+                    <Button Text="▶" Clicked="NextMonth_Clicked" Grid.Column="2" />
+                </Grid>
+                <CollectionView ItemsSource="{Binding Days}" x:Name="CalendarCollection" ItemsLayout="{StaticResource CalendarGrid}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:CalendarDay">
+                            <Frame CornerRadius="4" Padding="4" Margin="4" BackgroundColor="{Binding BgColor}" HeightRequest="60" WidthRequest="60">
+                                <Label Text="{Binding DisplayText}" HorizontalOptions="Center" VerticalOptions="Center" FontSize="11" />
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+        </ScrollView>
     </Grid>
 </ContentPage>

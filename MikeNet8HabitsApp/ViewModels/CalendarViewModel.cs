@@ -1,14 +1,26 @@
 using System.Collections.ObjectModel;
 using MikeNet8HabitsApp.Services;
 using MikeNet8HabitsApp.Classes;
+using System.ComponentModel;
 
 namespace MikeNet8HabitsApp.ViewModels;
 
-public class CalendarViewModel
+public class CalendarViewModel : INotifyPropertyChanged
 {
     private readonly DatabaseService _db;
     private readonly SettingsService _settings;
     public ObservableCollection<CalendarDay> Days { get; } = new();
+    public string MonthTitle
+    {
+        get => _monthTitle;
+        private set
+        {
+            if (_monthTitle == value) return;
+            _monthTitle = value;
+            OnPropertyChanged(nameof(MonthTitle));
+        }
+    }
+    private string _monthTitle;
 
     public CalendarViewModel(DatabaseService db, SettingsService settings)
     {
@@ -19,6 +31,7 @@ public class CalendarViewModel
     public async void Load(DateTime monthDate)
     {
         Days.Clear();
+        MonthTitle = monthDate.ToString("MMMM yyyy");
         var first = new DateTime(monthDate.Year, monthDate.Month, 1);
         int daysInMonth = DateTime.DaysInMonth(first.Year, first.Month);
         var records = await _db.GetAllHabitRecordsAsync();
@@ -26,19 +39,45 @@ public class CalendarViewModel
         for (int d = 1; d <= daysInMonth; d++)
         {
             var date = first.AddDays(d - 1);
+            var dayAbbrev = date.ToString("ddd").ToLower();
+            var displayBase = $"{d}. ({dayAbbrev})";
+            if (date.Date > DateTime.Today)
+            {
+                // Future day, show placeholder only
+                Days.Add(new CalendarDay
+                {
+                    Date = date,
+                    DisplayText = displayBase,
+                    BgColor = Colors.LightGray
+                });
+                continue;
+            }
             var dayRecords = records.Where(r => r.Date.Date == date.Date).ToList();
             int completed = dayRecords.Count(r => r.IsCompleted);
             int total = habits.Count;
             double percent = total == 0 ? 0 : (double)completed / total * 100;
             bool success = percent >= _settings.ThresholdPercent;
+            string statusIcon;
+            if (date.Date == DateTime.Today && !success)
+            {
+                // Do not show failure for today yet
+                statusIcon = string.Empty;
+            }
+            else
+            {
+                statusIcon = success ? " ✓" : " ✗";
+            }
             Days.Add(new CalendarDay
             {
                 Date = date,
-                DisplayText = success ? "✓" : "✗",
+                DisplayText = displayBase + statusIcon,
                 BgColor = success ? Colors.LightGreen : Colors.LightPink
             });
         }
     }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
 public class CalendarDay
