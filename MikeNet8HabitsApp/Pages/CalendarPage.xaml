@@ -1,9 +1,17 @@
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="MikeNet8HabitsApp.Pages.CalendarPage" Title="Calendar">
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+    xmlns:vm="clr-namespace:MikeNet8HabitsApp.ViewModels"
+    x:Class="MikeNet8HabitsApp.Pages.CalendarPage" 
+    Title="Calendar">
+    
+    <ContentPage.Resources>
+        <GridItemsLayout x:Key="CalendarGrid" Orientation="Vertical" Span="7" />
+    </ContentPage.Resources>
+    
     <Grid Padding="10">
         <CollectionView ItemsSource="{Binding Days}" x:Name="CalendarCollection" ItemsLayout="{StaticResource CalendarGrid}">
-            <CollectionView.Resources>
-                <GridItemsLayout x:Key="CalendarGrid" Orientation="Vertical" Span="7" />
-            </CollectionView.Resources>
+            
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="vm:CalendarDay">
                     <Frame CornerRadius="4" Padding="4" BackgroundColor="{Binding BgColor}">

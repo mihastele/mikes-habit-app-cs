@@ -143,28 +143,33 @@ namespace MikeNet8HabitsApp
             }
         }
 
+        private async void OnHomeClicked(object sender, EventArgs e)
+        {
+            await Navigation.PopAsync();
+            await Navigation.PushAsync(new MainPage());
+        }
         private async void OnAddHabitClicked(object sender, EventArgs e)
         {
+            await Navigation.PopAsync();
             await Navigation.PushAsync(new Pages.AddHabitPage());
         }
 
         private async void OnProgressClicked(object sender, EventArgs e)
         {
+            await Navigation.PopAsync();
             await Navigation.PushAsync(new Pages.HabitPerformancePage());
         }
 
-        private void OnCalendarClicked(object sender, EventArgs e)
+        private async void OnCalendarClicked(object sender, EventArgs e)
         {
-            // Navigate to the Calendar page
-            DisplayAlert("Calendar", "Navigate to Calendar page", "OK");
-            // In a real app: await Navigation.PushAsync(new CalendarPage());
+            await Navigation.PopAsync();
+            Navigation.PushAsync(new Pages.CalendarPage());
         }
 
-        private void OnSettingsClicked(object sender, EventArgs e)
+        private async void OnSettingsClicked(object sender, EventArgs e)
         {
-            // Navigate to the Settings page
-            DisplayAlert("Settings", "Navigate to Settings page", "OK");
-            // In a real app: await Navigation.PushAsync(new SettingsPage());
+            await Navigation.PopAsync();
+            Navigation.PushAsync(new Pages.SettingsPage());
         }
 
         private async void OnIncrementCountClicked(object sender, EventArgs e)

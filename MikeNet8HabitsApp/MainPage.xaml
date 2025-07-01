@@ -97,7 +97,22 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
+            
             <Button Grid.Column="0" 
+                    Clicked="OnHomeClicked"
+                    BackgroundColor="#2196F3"
+                    CornerRadius="20"
+                    WidthRequest="60"
+                    HeightRequest="60">
+                <Button.ImageSource>
+                    <FontImageSource Glyph="🏠"
+                                     Color="White"
+                                     Size="24" />
+                </Button.ImageSource>
+                <Button.SemanticProperties Hint="View progress" />
+            </Button>
+            
+            <Button Grid.Column="1" 
                     Clicked="OnAddHabitClicked"
                     BackgroundColor="#4CAF50"
                     CornerRadius="20"
@@ -112,7 +127,9 @@
                 <Button.SemanticProperties Hint="Add new habit" />
             </Button>
             
-            <Button Grid.Column="1" 
+            
+            
+            <Button Grid.Column="2" 
                     Clicked="OnProgressClicked"
                     BackgroundColor="#2196F3"
                     CornerRadius="20"
@@ -126,7 +143,7 @@
                 <Button.SemanticProperties Hint="View progress" />
             </Button>
             
-            <Button Grid.Column="2" 
+            <Button Grid.Column="3" 
                     Clicked="OnCalendarClicked"
                     BackgroundColor="#FF9800"
                     CornerRadius="20"
@@ -140,7 +157,7 @@
                 <Button.SemanticProperties Hint="View calendar" />
             </Button>
             
-            <Button Grid.Column="3" 
+            <Button Grid.Column="4" 
                     Clicked="OnSettingsClicked"
                     BackgroundColor="#9E9E9E"
                     CornerRadius="20"
