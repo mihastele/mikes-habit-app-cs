@@ -1,0 +1,4 @@
+adb shell
+run-as com.companyname.yourappname
+cd files
+rm yourdatabase.db3
