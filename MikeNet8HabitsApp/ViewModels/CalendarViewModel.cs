@@ -47,8 +47,9 @@ public class CalendarViewModel : INotifyPropertyChanged
                 Days.Add(new CalendarDay
                 {
                     Date = date,
-                    DisplayText = displayBase,
-                    BgColor = Colors.LightGray
+                    DayNumber = date.Day.ToString(),
+                    StatusIcon = string.Empty,
+                    StatusColor = Colors.LightGray
                 });
                 continue;
             }
@@ -57,21 +58,12 @@ public class CalendarViewModel : INotifyPropertyChanged
             int total = habits.Count;
             double percent = total == 0 ? 0 : (double)completed / total * 100;
             bool success = percent >= _settings.ThresholdPercent;
-            string statusIcon;
-            if (date.Date == DateTime.Today && !success)
-            {
-                // Do not show failure for today yet
-                statusIcon = string.Empty;
-            }
-            else
-            {
-                statusIcon = success ? " ✓" : " ✗";
-            }
             Days.Add(new CalendarDay
             {
                 Date = date,
-                DisplayText = displayBase + statusIcon,
-                BgColor = success ? Colors.LightGreen : Colors.LightPink
+                DayNumber = date.Day.ToString(),
+                StatusIcon = success ? "✓" : "✗",
+                StatusColor = success ? Color.FromArgb("#2E7D32") : Color.FromArgb("#C62828")
             });
         }
     }
@@ -83,6 +75,7 @@ public class CalendarViewModel : INotifyPropertyChanged
 public class CalendarDay
 {
     public DateTime Date { get; set; }
-    public string DisplayText { get; set; }
-    public Color BgColor { get; set; }
+    public string DayNumber { get; set; }
+    public string StatusIcon { get; set; }
+    public Color StatusColor { get; set; }
 }
