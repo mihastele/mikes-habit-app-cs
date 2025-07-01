@@ -18,11 +18,26 @@ public class HabitPerformanceViewModel : INotifyPropertyChanged
 
     public List<HabitPerformanceItem> HabitItems { get; private set; } = new List<HabitPerformanceItem>();
 
-    private readonly DatabaseService _db;
+    // Overall metrics
+    private int _totalCompleted;
+    public int TotalCompleted { get => _totalCompleted; private set { _totalCompleted = value; OnPropertyChanged(); } }
 
-    public HabitPerformanceViewModel(DatabaseService db)
+    private double _avgPercentPerDay;
+    public double AvgPercentPerDay { get => _avgPercentPerDay; private set { _avgPercentPerDay = value; OnPropertyChanged(); } }
+
+    private int _allHabitsStreak;
+    public int AllHabitsStreak { get => _allHabitsStreak; private set { _allHabitsStreak = value; OnPropertyChanged(); } }
+
+    private int _successfulDayStreak;
+    public int SuccessfulDayStreak { get => _successfulDayStreak; private set { _successfulDayStreak = value; OnPropertyChanged(); } }
+
+    private readonly DatabaseService _db;
+    private readonly SettingsService _settingsService;
+
+    public HabitPerformanceViewModel(DatabaseService db, SettingsService settingsService)
     {
         _db = db;
+        _settingsService = settingsService;
     }
 
     public async void LoadData()
@@ -44,6 +59,16 @@ public class HabitPerformanceViewModel : INotifyPropertyChanged
             });
         }
         OnPropertyChanged(nameof(HabitItems));
+
+        // Overall metrics calc
+        var allRecords = await _db.GetAllHabitRecordsAsync();
+        TotalCompleted = allRecords.Count(r => r.IsCompleted);
+
+        var grouped = allRecords.GroupBy(r => r.Date.Date);
+        AvgPercentPerDay = grouped.Any() ? grouped.Average(g => (double)g.Count(r => r.IsCompleted) / habits.Count * 100) : 0;
+
+        AllHabitsStreak = CalculateStreak(grouped, habits.Count, requireAll: true);
+        SuccessfulDayStreak = CalculateStreak(grouped, habits.Count, requireAll: false);
     }
 
     private int CalculateCurrentStreak(List<HabitRecord> records)
@@ -88,6 +113,24 @@ public class HabitPerformanceViewModel : INotifyPropertyChanged
             if (currentStreak > maxStreak) maxStreak = currentStreak;
         }
         return maxStreak;
+    }
+
+    private int CalculateStreak(IEnumerable<IGrouping<DateTime, HabitRecord>> groupByDay, int totalHabits, bool requireAll)
+    {
+        int streak = 0, max = 0;
+        var ordered = groupByDay.OrderBy(g => g.Key).ToList();
+        for (int i = 0; i < ordered.Count; i++)
+        {
+            bool success = requireAll ? ordered[i].Count(r => r.IsCompleted) == totalHabits
+                                       : ((double)ordered[i].Count(r => r.IsCompleted) / totalHabits * 100) >= (_settingsService?.ThresholdPercent ?? 80);
+            if (success)
+            {
+                streak++;
+                max = Math.Max(max, streak);
+            }
+            else streak = 0;
+        }
+        return max;
     }
 }
 

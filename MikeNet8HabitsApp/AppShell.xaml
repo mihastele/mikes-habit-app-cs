@@ -7,9 +7,11 @@
     Shell.FlyoutBehavior="Disabled"
     Title="MikeNet8HabitsApp">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <ShellContent Title="Home" ContentTemplate="{DataTemplate local:MainPage}" Route="MainPage" />
+        <ShellContent Title="Calendar" ContentTemplate="{DataTemplate local:CalendarPage}" Route="CalendarPage" />
+        <ShellContent Title="Performance" ContentTemplate="{DataTemplate local:HabitPerformancePage}" Route="PerformancePage" />
+        <ShellContent Title="Settings" ContentTemplate="{DataTemplate local:SettingsPage}" Route="SettingsPage" />
+    </TabBar>
 
 </Shell>

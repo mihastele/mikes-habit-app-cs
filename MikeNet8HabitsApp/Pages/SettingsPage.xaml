@@ -1,0 +1,17 @@
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="MikeNet8HabitsApp.Pages.SettingsPage"
+    Title="Settings">
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <Label Text="Data" FontAttributes="Bold" />
+            <Button Text="Export habits and records" Clicked="OnExportClicked" />
+            <Button Text="Import habits and records" Clicked="OnImportClicked" />
+            
+            <Label Text="Threshold % for successful day" FontAttributes="Bold" />
+            <Slider x:Name="ThresholdSlider" Minimum="0" Maximum="100" ValueChanged="OnThresholdChanged" />
+            <Label x:Name="ThresholdLabel" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

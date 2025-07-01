@@ -14,7 +14,8 @@ public partial class HabitPerformancePage : ContentPage
     public HabitPerformancePage()
     {
         InitializeComponent();
-        _viewModel = new HabitPerformanceViewModel(App.Current.Handler.MauiContext.Services.GetService<DatabaseService>());
+        _viewModel = new HabitPerformanceViewModel(App.Current.Handler.MauiContext.Services.GetService<DatabaseService>(),
+            App.Current.Handler.MauiContext.Services.GetService<SettingsService>());
         BindingContext = _viewModel;
     }
 

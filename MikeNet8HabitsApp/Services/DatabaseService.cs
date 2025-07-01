@@ -29,6 +29,9 @@ public class DatabaseService
         await _connection.CreateTableAsync<CountableHabit>();
         await _connection.CreateTableAsync<HabitRecord>();
         
+        // Settings table for future extension (key/value). Currently Preferences API is used instead.
+        // await _connection.ExecuteAsync("CREATE TABLE IF NOT EXISTS Settings (Key TEXT PRIMARY KEY, Value TEXT)");
+        
         // For debugging: Verify tables were ensured
         var tableInfo = await _connection.GetTableInfoAsync("Habit");
         System.Diagnostics.Debug.WriteLine($"Habit table ensured with {tableInfo.Count} columns");
@@ -147,6 +150,11 @@ public class DatabaseService
     public async Task<List<HabitRecord>> GetAllHabitRecordsForHabitAsync(int habitId)
     {
         return await _connection.Table<HabitRecord>().Where(r => r.HabitId == habitId).ToListAsync();
+    }
+
+    public async Task<List<HabitRecord>> GetAllHabitRecordsAsync()
+    {
+        return await _connection.Table<HabitRecord>().ToListAsync();
     }
 
     private async Task<int> UpdateOrInsertCountableHabitAsync(CountableHabit countable)

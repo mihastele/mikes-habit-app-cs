@@ -18,8 +18,15 @@ public static class MauiProgram
             });
 
         builder.Services.AddSingleton<Services.DatabaseService>();
-        builder.Services.AddSingleton<HabitPerformanceViewModel>();
+        builder.Services.AddSingleton<Services.SettingsService>();
+
+        builder.Services.AddSingleton<ViewModels.HabitPerformanceViewModel>();
+
+        // Pages
         builder.Services.AddTransient<Pages.AddHabitPage>();
+        builder.Services.AddTransient<Pages.CalendarPage>();
+        builder.Services.AddTransient<Pages.SettingsPage>();
+        builder.Services.AddTransient<Pages.HabitPerformancePage>();
         builder.Services.AddTransient<MainPage>();
 
 #if DEBUG
