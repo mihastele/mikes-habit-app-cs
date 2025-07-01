@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using MikeNet8HabitsApp.Classes;
 using MikeNet8HabitsApp.Services;
+using Microsoft.Maui.Controls;
 
 namespace MikeNet8HabitsApp.ViewModels;
 
@@ -16,7 +19,16 @@ public class HabitPerformanceViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public List<HabitPerformanceItem> HabitItems { get; private set; } = new List<HabitPerformanceItem>();
+    private List<HabitPerformanceItem> _habitItems = new List<HabitPerformanceItem>();
+    public List<HabitPerformanceItem> HabitItems 
+    { 
+        get => _habitItems;
+        private set 
+        { 
+            _habitItems = value; 
+            OnPropertyChanged(); 
+        } 
+    }
 
     // Overall metrics
     private int _totalCompleted;
@@ -40,35 +52,77 @@ public class HabitPerformanceViewModel : INotifyPropertyChanged
         _settingsService = settingsService;
     }
 
-    public async void LoadData()
+    private bool _isLoading;
+    public bool IsLoading
     {
-        var habits = await _db.GetAllHabitsAsync();
-        HabitItems.Clear();
-        foreach (var habit in habits)
+        get => _isLoading;
+        private set { _isLoading = value; OnPropertyChanged(); }
+    }
+
+    private string _errorMessage;
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        private set { _errorMessage = value; OnPropertyChanged(); OnPropertyChanged(nameof(HasError)); }
+    }
+
+    public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+    public bool IsNotLoading => !IsLoading;
+
+    private Command _loadDataCommand;
+    public ICommand LoadDataCommand => _loadDataCommand ??= new Command(async () => await LoadDataAsync());
+
+    public async Task LoadDataAsync()
+    {
+        try
         {
-            var records = await _db.GetAllHabitRecordsForHabitAsync(habit.Id);
-            int completedDays = records.Count(r => r.IsCompleted);
-            double completionPercentage = records.Count > 0 ? (double)completedDays / records.Count * 100 : 0;
-            int totalCompletions = completedDays;
-            int currentStreak = CalculateCurrentStreak(records);
-            int longestStreak = CalculateLongestStreak(records);
-            HabitItems.Add(new HabitPerformanceItem
+            IsLoading = true;
+            ErrorMessage = null;
+
+            var habits = await _db.GetAllHabitsAsync();
+            var habitItems = new List<HabitPerformanceItem>();
+            
+            foreach (var habit in habits)
             {
-                HabitName = habit.Name,
-                PerformanceStats = $"Completion: {completionPercentage:F2}%, Total Completions: {totalCompletions}, Current Streak: {currentStreak} days, Longest Streak: {longestStreak} days"
-            });
+                var records = await _db.GetAllHabitRecordsForHabitAsync(habit.Id);
+                int completedDays = records.Count(r => r.IsCompleted);
+                double completionPercentage = records.Count > 0 ? (double)completedDays / records.Count * 100 : 0;
+                int totalCompletions = completedDays;
+                int currentStreak = CalculateCurrentStreak(records);
+                int longestStreak = CalculateLongestStreak(records);
+                
+                habitItems.Add(new HabitPerformanceItem
+                {
+                    HabitName = habit.Name,
+                    PerformanceStats = $"Completion: {completionPercentage:F2}%, Total Completions: {totalCompletions}, Current Streak: {currentStreak} days, Longest Streak: {longestStreak} days"
+                });
+            }
+
+            HabitItems = habitItems;
+            OnPropertyChanged(nameof(HabitItems));
+
+            // Overall metrics calc
+            var allRecords = await _db.GetAllHabitRecordsAsync();
+            TotalCompleted = allRecords.Count(r => r.IsCompleted);
+
+            var grouped = allRecords.GroupBy(r => r.Date.Date);
+            AvgPercentPerDay = grouped.Any() && habits.Count > 0 
+                ? grouped.Average(g => (double)g.Count(r => r.IsCompleted) / habits.Count * 100) 
+                : 0;
+
+            AllHabitsStreak = habits.Count > 0 ? CalculateStreak(grouped, habits.Count, requireAll: true) : 0;
+            SuccessfulDayStreak = habits.Count > 0 ? CalculateStreak(grouped, habits.Count, requireAll: false) : 0;
         }
-        OnPropertyChanged(nameof(HabitItems));
-
-        // Overall metrics calc
-        var allRecords = await _db.GetAllHabitRecordsAsync();
-        TotalCompleted = allRecords.Count(r => r.IsCompleted);
-
-        var grouped = allRecords.GroupBy(r => r.Date.Date);
-        AvgPercentPerDay = grouped.Any() ? grouped.Average(g => (double)g.Count(r => r.IsCompleted) / habits.Count * 100) : 0;
-
-        AllHabitsStreak = CalculateStreak(grouped, habits.Count, requireAll: true);
-        SuccessfulDayStreak = CalculateStreak(grouped, habits.Count, requireAll: false);
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Error loading performance data: {ex.Message}";
+            // Optionally log the full exception
+            System.Diagnostics.Debug.WriteLine(ex);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     private int CalculateCurrentStreak(List<HabitRecord> records)

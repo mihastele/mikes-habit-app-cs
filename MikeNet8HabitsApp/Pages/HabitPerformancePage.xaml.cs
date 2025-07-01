@@ -19,9 +19,9 @@ public partial class HabitPerformancePage : ContentPage
         BindingContext = _viewModel;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
-        _viewModel.LoadData();
+        await _viewModel.LoadDataAsync();
     }
 }
