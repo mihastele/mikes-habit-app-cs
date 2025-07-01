@@ -106,6 +106,10 @@ public class DatabaseService
 
     public async Task DeleteHabitAsync(int id)
     {
+        // Remove all habit records associated with this habit first
+        await _connection.ExecuteAsync("DELETE FROM HabitRecord WHERE HabitId = ?", id);
+
+        // Now remove the habit itself (or countable habit)
         var habit = await _connection.FindAsync<Habit>(id);
         if (habit != null)
         {

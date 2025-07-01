@@ -42,11 +42,17 @@ namespace MikeNet8HabitsApp
             LoadHabitsForDate(_currentDate);
         }
 
-        private void OnNextDayClicked(object sender, EventArgs e)
+        private async void OnNextDayClicked(object sender, EventArgs e)
         {
-            _currentDate = _currentDate.AddDays(1);
+            var nextDate = _currentDate.AddDays(1);
+            if (nextDate.Date > DateTime.Today)
+            {
+                await DisplayAlert("No no, no cheating", "You cannot log habits for future dates!", "OK");
+                return;
+            }
+
+            _currentDate = nextDate;
             UpdateDateDisplay();
-            // Here you would load habits for the selected date
             LoadHabitsForDate(_currentDate);
         }
 
