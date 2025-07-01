@@ -3,7 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:MikeNet8HabitsApp.ViewModels"
     x:Class="MikeNet8HabitsApp.Pages.HabitPerformancePage"
-    Title="Habit Performance">
+    Title="Habit Performance"
+    x:Name="PerformancePage">
     <Grid RowDefinitions="Auto,*,Auto">
         <!-- Loading Indicator -->
         <ActivityIndicator 
@@ -32,14 +33,39 @@
                 <StackLayout Padding="20" IsVisible="{Binding IsNotLoading}">
                     <Label Text="Habit Performance" FontSize="24" HorizontalOptions="Center" Margin="0,0,0,20" />
                     
+                    <!-- Overall Completion Stats -->
                     <Frame BorderColor="{StaticResource Primary}" Padding="15" Margin="0,0,0,20">
                         <StackLayout Spacing="10">
-                            <Label Text="Overall Metrics" FontAttributes="Bold" FontSize="18" />
+                            <Label Text="Completion Stats" FontAttributes="Bold" FontSize="18" />
                             <BoxView HeightRequest="1" BackgroundColor="{StaticResource Gray300}" Margin="0,0,0,5"/>
-                            <Label Text="{Binding TotalCompleted, StringFormat='Total completed: {0}'}" />
-                            <Label Text="{Binding AvgPercentPerDay, StringFormat='Avg % per day: {0:F1}%'}" />
-                            <Label Text="{Binding AllHabitsStreak, StringFormat='All habits streak: {0} days'}" />
-                            <Label Text="{Binding SuccessfulDayStreak, StringFormat='Successful days streak: {0} days'}" />
+                            <Label Text="{Binding TotalCompleted, StringFormat='✓ Total habits completed: {0}'}" />
+                            <Label Text="{Binding AvgPercentPerDay, StringFormat='📊 Avg completion per day: {0:F1}%'}" />
+                        </StackLayout>
+                    </Frame>
+
+                    <!-- All Habits Completion -->
+                    <Frame BorderColor="{StaticResource Primary}" Padding="15" Margin="0,0,0,20">
+                        <StackLayout Spacing="10">
+                            <Label Text="All Habits Completion" FontAttributes="Bold" FontSize="18" />
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource Gray300}" Margin="0,0,0,5"/>
+                            <Label Text="{Binding AllHabitsCompletedCount, StringFormat='✓ Days all habits completed: {0}'}" />
+                            <Label Text="{Binding CurrentAllHabitsStreak, StringFormat='🔥 Current streak: {0} days'}" />
+                            <Label Text="{Binding LongestAllHabitsStreak, StringFormat='🏆 Longest streak: {0} days'}" />
+                        </StackLayout>
+                    </Frame>
+
+                    <!-- Successful Days -->
+                    <Frame BorderColor="{StaticResource Primary}" Padding="15" Margin="0,0,0,20">
+                        <StackLayout Spacing="10">
+                            <Label Text="Successful Days" FontAttributes="Bold" FontSize="18" />
+                            <Label Text="{Binding ThresholdPercent, StringFormat='(Threshold: {0}% of habits)'}" 
+                                   FontSize="12" 
+                                   TextColor="{StaticResource Gray600}" 
+                                   Margin="0,-10,0,0"/>
+                            <BoxView HeightRequest="1" BackgroundColor="{StaticResource Gray300}" Margin="0,0,0,5"/>
+                            <Label Text="{Binding SuccessfulDaysCount, StringFormat='✓ Successful days: {0}'}" />
+                            <Label Text="{Binding CurrentSuccessfulDayStreak, StringFormat='🔥 Current streak: {0} days'}" />
+                            <Label Text="{Binding LongestSuccessfulDayStreak, StringFormat='🏆 Longest streak: {0} days'}" />
                         </StackLayout>
                     </Frame>
 
