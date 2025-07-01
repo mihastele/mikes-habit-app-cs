@@ -39,7 +39,7 @@ public class CalendarViewModel : INotifyPropertyChanged
         for (int d = 1; d <= daysInMonth; d++)
         {
             var date = first.AddDays(d - 1);
-            var dayAbbrev = date.ToString("ddd").ToLower();
+            var dayAbbrev = date.ToString("ddd");//.ToLower();
             var displayBase = $"{d}. ({dayAbbrev})";
             if (date.Date > DateTime.Today)
             {
@@ -48,6 +48,7 @@ public class CalendarViewModel : INotifyPropertyChanged
                 {
                     Date = date,
                     DayNumber = date.Day.ToString(),
+                    DisplayText = displayBase,
                     StatusIcon = string.Empty,
                     StatusColor = Colors.LightGray
                 });
@@ -62,6 +63,7 @@ public class CalendarViewModel : INotifyPropertyChanged
             {
                 Date = date,
                 DayNumber = date.Day.ToString(),
+                DisplayText = displayBase,
                 StatusIcon = success ? "✓" : "✗",
                 StatusColor = success ? Color.FromArgb("#2E7D32") : Color.FromArgb("#C62828")
             });
@@ -75,6 +77,7 @@ public class CalendarViewModel : INotifyPropertyChanged
 public class CalendarDay
 {
     public DateTime Date { get; set; }
+    public string DisplayText { get; set; }
     public string DayNumber { get; set; }
     public string StatusIcon { get; set; }
     public Color StatusColor { get; set; }

@@ -22,7 +22,7 @@
                         <DataTemplate x:DataType="vm:CalendarDay">
                             <Frame CornerRadius="4" Padding="4" Margin="4" BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" HeightRequest="80" WidthRequest="80">
                                 <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
-                                    <Label Text="{Binding Date.Day}" HorizontalOptions="Center" VerticalOptions="Center" FontSize="14" />
+                                    <Label Text="{Binding DisplayText}" HorizontalOptions="Center" VerticalOptions="Center" FontSize="14" />
                                     <Label Text="{Binding StatusIcon}" HorizontalOptions="Center" VerticalOptions="Center" FontSize="20" TextColor="{Binding StatusColor}" />
                                 </VerticalStackLayout>
                             </Frame>
