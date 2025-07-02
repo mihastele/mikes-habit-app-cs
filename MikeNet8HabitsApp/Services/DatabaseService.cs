@@ -26,8 +26,7 @@ public class DatabaseService
         // await _connection.DropTableAsync<HabitRecord>();
         
         // Create new tables with updated schema if they do not exist
-        await _connection.CreateTableAsync<Habit>();
-        await _connection.CreateTableAsync<CountableHabit>();
+        await _connection.CreateTableAsync<Habit>(); // CountableHabit now shares the same table via inheritance attribute
         await _connection.CreateTableAsync<HabitRecord>();
         
         // Settings table for future extension (key/value). Currently Preferences API is used instead.
@@ -41,15 +40,24 @@ public class DatabaseService
     // Returns all habits (including countable ones) ordered by Id.
     public async Task<List<Habit>> GetAllHabitsAsync()
     {
-        var habits = await _connection.Table<Habit>().ToListAsync();
-        var countables = await _connection.Table<CountableHabit>().ToListAsync();
+        // Querying both types can return duplicate rows because they map to the same physical table.
+        // Instead, load from the most derived type and then distinct-by-Id to guarantee uniqueness.
+        var all = new List<Habit>();
+        // Load rows that have TargetCount column too (as CountableHabit)
+        var countableRows = await _connection.Table<CountableHabit>().ToListAsync();
+        all.AddRange(countableRows);
 
-        // Merge lists preserving derived type info
-        var result = new List<Habit>();
-        result.AddRange(habits);
-        result.AddRange(countables);
-        result.Sort((a, b) => a.Id.CompareTo(b.Id));
-        return result;
+        // Load the rest as plain Habit (these rows will have TargetCount=0 by default when read as CountableHabit)
+        var baseRows = await _connection.Table<Habit>().ToListAsync();
+        all.AddRange(baseRows);
+
+        // Distinct by Id to eliminate duplicates
+        var distinct = all
+            .GroupBy(h => h.Id)
+            .Select(g => g.First())
+            .OrderBy(h => h.Id)
+            .ToList();
+        return distinct;
     }
 
     public async Task<int> SaveHabitAsync(Habit habit, bool isImport = false)

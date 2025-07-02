@@ -16,5 +16,8 @@ namespace MikeNet8HabitsApp.Classes
         public DateTime Date { get; set; }
         
         public bool IsCompleted { get; set; }
+    
+    // Track progress for countable habits
+    public int Count { get; set; } = 0;
     }
 }

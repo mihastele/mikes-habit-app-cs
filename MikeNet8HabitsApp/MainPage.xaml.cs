@@ -188,14 +188,33 @@ namespace MikeNet8HabitsApp
         {
             if (sender is Button button && button.BindingContext is CountableHabit habit)
             {
-                habit.CurrentCount++;
-                if (habit.CurrentCount >= habit.TargetCount)
+                // Get or create today's record
+                var record = await _db.GetHabitRecordAsync(habit.Id, _currentDate) ?? new HabitRecord
                 {
+                    HabitId = habit.Id,
+                    Date = _currentDate,
+                    IsCompleted = false,
+                    Count = 0
+                };
+
+                // Update count and completion status
+                record.Count++;
+                if (record.Count >= habit.TargetCount)
+                {
+                    record.IsCompleted = true;
                     habit.IsCompleted = true;
                 }
 
+                // Save changes
+                await _db.SaveHabitRecordAsync(record);
                 await _db.SaveHabitAsync(habit);
-                await UpdateHabitRecord(habit);
+
+                // Update the UI
+                if (habit is CountableHabit countable)
+                {
+                    countable.CurrentCount = record.Count;
+                    OnPropertyChanged(nameof(habit.IsCompleted));
+                }
             }
         }
 

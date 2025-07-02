@@ -54,5 +54,5 @@ public class Habit : INotifyPropertyChanged
     public int Streak { get; set; }
 
     // Used by UI to decide whether to show count-related controls
-    public virtual bool IsCountable => false;
+    public bool IsCountable { get; set; } = false;
 }

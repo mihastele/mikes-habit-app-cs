@@ -1,21 +1,22 @@
 using SQLite;
+using Microsoft.Maui.Graphics;
 
 namespace MikeNet8HabitsApp.Classes;
 
-[Table("CountableHabits")]  // Explicit table name to avoid conflicts
+[Table("Habit")]  // Map to the same "Habit" table so IDs are unique across all habit types
 public class CountableHabit : Habit
 {
     public int TargetCount { get; set; } = 0;
+    
+    [Ignore] // Do not persist daily progress in the Habit table – it belongs in HabitRecord
     public int CurrentCount { get; set; } = 0;
 
     public CountableHabit() : base()
     {
-        // Ensure default color is set for new CountableHabit instances
+        // Mark this as a countable habit and set default color
+        IsCountable = true;
         Color = Colors.LightGray;
     }
-
-    [Ignore]  // This property is already defined in the base class
-    public override bool IsCountable => true;
     
     // Add a method to update counts safely
     public void UpdateCount(int change)
