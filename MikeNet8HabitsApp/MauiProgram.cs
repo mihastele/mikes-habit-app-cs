@@ -36,19 +36,7 @@ public static class MauiProgram
 #endif
 
         var app = builder.Build();
-        
-        // Initialize database before the app starts
-        var databaseService = app.Services.GetRequiredService<Services.DatabaseService>();
-        var initTask = databaseService.InitializeAsync();
-        initTask.Wait(); // Block here to ensure DB is initialized before proceeding
-        
-        if (initTask.IsFaulted)
-        {
-            // Log the error and crash the app if we can't initialize the database
-            System.Diagnostics.Debug.WriteLine($"Failed to initialize database: {initTask.Exception}");
-            throw initTask.Exception;
-        }
-        
+        var databaseService = app.Services.GetService<Services.DatabaseService>();
         return app;
     }
 }
