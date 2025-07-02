@@ -9,13 +9,13 @@
             <Button Text="Export habits and records" Clicked="OnExportClicked" />
             <Button Text="Import habits and records (merge)" Clicked="OnImportClicked" />
             
-            <Label Text="Threshold % for successful day" FontAttributes="Bold" />
+            <Label Margin="0,30,0,0" Text="Threshold % for successful day" FontAttributes="Bold" />
             <Slider x:Name="ThresholdSlider" Minimum="0" Maximum="100" ValueChanged="OnThresholdChanged" />
             <Label x:Name="ThresholdLabel" />
 
             <!-- Danger Zone -->
-            <Label Text="Danger Zone" FontAttributes="Bold" TextColor="Red" />
-            <VerticalStackLayout BackgroundColor="#2a0000" Padding="10" Spacing="8">
+            <Label Margin="0,30,0,0" Text="Danger Zone" FontAttributes="Bold" TextColor="Red" />
+            <VerticalStackLayout Spacing="16">
                 <Button Text="Delete all data" BackgroundColor="Red" TextColor="White" Clicked="OnDeleteDbClicked" />
                 <Button Text="Import habits and records (overwrite)" BackgroundColor="Red" TextColor="White" Clicked="OnOverwriteImportClicked" />
             </VerticalStackLayout>

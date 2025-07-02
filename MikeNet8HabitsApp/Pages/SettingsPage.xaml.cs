@@ -1,6 +1,9 @@
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
 using System.IO;
 using System.Linq;
+using System.Text;
+using CommunityToolkit.Maui.Storage;
 using MikeNet8HabitsApp.Services;
 
 namespace MikeNet8HabitsApp.Pages;
@@ -28,20 +31,20 @@ public partial class SettingsPage : ContentPage
 
     private async void OnExportClicked(object sender, EventArgs e)
     {
-        var path = await _settings.ExportAsync(_db);
-        await DisplayAlert("Export", $"Exported to {path}", "OK");
+        var (json, suggestedName) = await _settings.BuildExportJsonAsync(_db);
+        var bytes = Encoding.UTF8.GetBytes(json);
+        using var stream = new MemoryStream(bytes);
+        var saveResult = await FileSaver.Default.SaveAsync(suggestedName, stream, CancellationToken.None);
+        if (saveResult.IsSuccessful)
+            await DisplayAlert("Export", $"Saved to {saveResult.FilePath}", "OK");
     }
 
     private async void OnImportClicked(object sender, EventArgs e)
     {
         // Merge import – keeps existing data, skips duplicates
-        string latest = Directory.GetFiles(FileSystem.AppDataDirectory, "habits_export_*.json").OrderByDescending(f => f).FirstOrDefault();
-        if (latest == null)
-        {
-            await DisplayAlert("Import", "No export file found.", "OK");
-            return;
-        }
-        await _settings.ImportAsync(_db, latest);
+        var pickResult = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = "Select habits export" });
+        if (pickResult == null) return;
+        await _settings.ImportAsync(_db, pickResult.FullPath);
         await DisplayAlert("Import", "Merge import finished", "OK");
     }
 
@@ -55,17 +58,13 @@ public partial class SettingsPage : ContentPage
 
     private async void OnOverwriteImportClicked(object sender, EventArgs e)
     {
-        string latest = Directory.GetFiles(FileSystem.AppDataDirectory, "habits_export_*.json").OrderByDescending(f => f).FirstOrDefault();
-        if (latest == null)
-        {
-            await DisplayAlert("Import", "No export file found.", "OK");
-            return;
-        }
+        var pickResult = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = "Select habits export" });
+        if (pickResult == null) return;
         bool confirm = await DisplayAlert("Overwrite Import", "This will delete current data and import from the selected file. Continue?", "Import", "Cancel");
         if (!confirm) return;
 
         await _db.ResetDatabaseAsync();
-        await _settings.ImportAsync(_db, latest);
+        await _settings.ImportAsync(_db, pickResult.FullPath);
         await DisplayAlert("Import", "Overwrite import finished", "OK");
     }
 }

@@ -23,11 +23,10 @@ public class SettingsService
     }
 
     /// <summary>
-    /// Export all habits, records and settings to a JSON file inside <see cref="FileSystem.AppDataDirectory"/>.
-    /// File name pattern: habits_export_yyyyMMddHHmmss.json
-    /// Returns the full file path.
+    /// Creates JSON containing all habits, records and settings. Used by UI to save to chosen location.
+    /// Returns the JSON string and suggested filename.
     /// </summary>
-    public async Task<string> ExportAsync(DatabaseService db)
+    public async Task<(string json, string fileName)> BuildExportJsonAsync(DatabaseService db)
     {
         var exportObj = new
         {
@@ -38,18 +37,15 @@ public class SettingsService
         };
 
         var json = JsonSerializer.Serialize(exportObj, new JsonSerializerOptions { WriteIndented = true });
-        var filePath = Path.Combine(FileSystem.AppDataDirectory, $"habits_export_{DateTime.Now:yyyyMMddHHmmss}.json");
-        File.WriteAllText(filePath, json);
-        return filePath;
+        var fileName = $"habits_export_{DateTime.Now:yyyyMMddHHmmss}.json";
+        return (json, fileName);
     }
 
     /// <summary>
-    /// Import previously exported JSON file. Existing DB rows are left intact – duplicates are skipped.
+    /// Import previously exported JSON string. Existing DB rows are left intact – duplicates are skipped.
     /// </summary>
-    public async Task ImportAsync(DatabaseService db, string filePath)
+    public async Task ImportFromJsonAsync(DatabaseService db, string json)
     {
-        if (!File.Exists(filePath)) return;
-        var json = await File.ReadAllTextAsync(filePath);
         var doc = JsonDocument.Parse(json).RootElement;
 
         if (doc.TryGetProperty("Settings", out var s) && s.TryGetProperty("ThresholdPercent", out var tp))
@@ -71,5 +67,15 @@ public class SettingsService
                 await db.SaveHabitRecordAsync(rec);
             }
         }
+    }
+
+    /// <summary>
+    /// Convenience wrapper to import by file path.
+    /// </summary>
+    public async Task ImportAsync(DatabaseService db, string filePath)
+    {
+        if (!File.Exists(filePath)) return;
+        var json = await File.ReadAllTextAsync(filePath);
+        await ImportFromJsonAsync(db, json);
     }
 }
