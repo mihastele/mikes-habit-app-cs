@@ -63,11 +63,11 @@ namespace MikeNet8HabitsApp.Pages
                             status.AppendLine($"  Type: {sample.GetType().Name}");
                             status.AppendLine($"  IsCountable: {sample.IsCountable}");
                             
-                            if (sample is Classes.CountableHabit countable)
-                            {
-                                status.AppendLine($"  CurrentCount: {countable.CurrentCount}");
-                                status.AppendLine($"  TargetCount: {countable.TargetCount}");
-                            }
+                            // if (sample is Classes.CountableHabit countable)
+                            // {
+                            //     status.AppendLine($"  CurrentCount: {countable.CurrentCount}");
+                            //     status.AppendLine($"  TargetCount: {countable.TargetCount}");
+                            // }
                         }
                     }
                     catch (Exception ex)

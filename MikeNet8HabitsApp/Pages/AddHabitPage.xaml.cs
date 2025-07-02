@@ -52,36 +52,28 @@ public partial class AddHabitPage : ContentPage
             var countableSwitch = (Switch)FindByName("CountableSwitch");
             var isCountable = countableSwitch?.IsToggled ?? false;
 
-            Habit habit;
+            var targetCount = 0;
             if (isCountable)
             {
                 var targetCountEntry = (Entry)FindByName("TargetCountEntry");
-                if (!int.TryParse(targetCountEntry?.Text, out var target) || target <= 0)
+                if (!int.TryParse(targetCountEntry?.Text, out targetCount) || targetCount <= 0)
                 {
                     await DisplayAlert("Validation", "Please enter a valid target count greater than zero.", "OK");
                     return;
                 }
-                
-                habit = new CountableHabit
-                {
-                    Name = name,
-                    Description = description,
-                    TargetCount = target,
-                    CurrentCount = 0,
-                    ColorHex = Colors.LightGray.ToHex(),
-                    Streak = 0
-                };
             }
-            else
+            
+            var habit = new Habit
             {
-                habit = new Habit
-                {
-                    Name = name,
-                    Description = description,
-                    ColorHex = Colors.LightGray.ToHex(),
-                    Streak = 0
-                };
-            }
+                Name = name,
+                Description = description,
+                IsCountable = isCountable,
+                TargetCount = targetCount,
+                CurrentCount = 0,
+                ColorHex = Colors.LightGray.ToHex(),
+                Streak = 0,
+                IsCompleted = false
+            };
 
 
             Debug.WriteLine($"Attempting to save habit: {habit.Name}");

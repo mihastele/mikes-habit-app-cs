@@ -57,14 +57,14 @@ public class SettingsService
             {
                 // Determine habit type based on serialized properties
                 Habit habit;
-                if (habitElem.TryGetProperty("IsCountable", out var countableProp) && countableProp.GetBoolean())
-                {
-                    habit = JsonSerializer.Deserialize<CountableHabit>(habitElem.GetRawText());
-                }
-                else
-                {
+                // if (habitElem.TryGetProperty("IsCountable", out var countableProp) && countableProp.GetBoolean())
+                // {
+                //     habit = JsonSerializer.Deserialize<CountableHabit>(habitElem.GetRawText());
+                // }
+                // else
+                // {
                     habit = JsonSerializer.Deserialize<Habit>(habitElem.GetRawText());
-                }
+                // }
                 await db.SaveHabitAsync(habit, true); // Import mode
             }
         }

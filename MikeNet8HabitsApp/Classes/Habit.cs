@@ -53,6 +53,25 @@ public class Habit : INotifyPropertyChanged
     
     public int Streak { get; set; }
 
-    // Used by UI to decide whether to show count-related controls
+    // Countable habit properties
     public bool IsCountable { get; set; } = false;
+    public int TargetCount { get; set; } = 0;
+    
+    [Ignore] // Not persisted - derived from HabitRecord
+    public int CurrentCount { get; set; } = 0;
+
+    // Helper method for countable habits
+    public void UpdateCount(int change)
+    {
+        if (!IsCountable) return;
+        
+        var newCount = CurrentCount + change;
+        if (newCount >= 0 && newCount <= TargetCount)
+        {
+            CurrentCount = newCount;
+            IsCompleted = (CurrentCount >= TargetCount);
+            OnPropertyChanged(nameof(CurrentCount));
+            OnPropertyChanged(nameof(IsCompleted));
+        }
+    }
 }

@@ -131,9 +131,10 @@ namespace MikeNet8HabitsApp
             if (sender is CheckBox checkBox && checkBox.BindingContext is Habit habit)
             {
                 habit.IsCompleted = e.Value;
-                if (habit is CountableHabit countableHabit && !e.Value)
+                if (habit.IsCountable && !e.Value)
                 {
-                    countableHabit.CurrentCount = 0;
+                    // Reset count when unchecking a countable habit
+                    habit.CurrentCount = 0;
                 }
 
                 await _db.SaveHabitAsync(habit);
@@ -186,7 +187,7 @@ namespace MikeNet8HabitsApp
 
         private async void OnIncrementCountClicked(object sender, EventArgs e)
         {
-            if (sender is Button button && button.BindingContext is CountableHabit habit)
+            if (sender is Button button && button.BindingContext is Habit habit && habit.IsCountable)
             {
                 // Get or create today's record
                 var record = await _db.GetHabitRecordAsync(habit.Id, _currentDate) ?? new HabitRecord
@@ -199,6 +200,8 @@ namespace MikeNet8HabitsApp
 
                 // Update count and completion status
                 record.Count++;
+                habit.CurrentCount = record.Count;
+                
                 if (record.Count >= habit.TargetCount)
                 {
                     record.IsCompleted = true;
@@ -208,13 +211,10 @@ namespace MikeNet8HabitsApp
                 // Save changes
                 await _db.SaveHabitRecordAsync(record);
                 await _db.SaveHabitAsync(habit);
-
+                
                 // Update the UI
-                if (habit is CountableHabit countable)
-                {
-                    countable.CurrentCount = record.Count;
-                    OnPropertyChanged(nameof(habit.IsCompleted));
-                }
+                OnPropertyChanged(nameof(habit.IsCompleted));
+                OnPropertyChanged(nameof(habit.CurrentCount));
             }
         }
 

@@ -37,36 +37,24 @@ public class DatabaseService
         System.Diagnostics.Debug.WriteLine($"Habit table ensured with {tableInfo.Count} columns");
     }
 
-    // Returns all habits (including countable ones) ordered by Id.
+    // Returns all habits ordered by Id
     public async Task<List<Habit>> GetAllHabitsAsync()
     {
-        // Querying both types can return duplicate rows because they map to the same physical table.
-        // Instead, load from the most derived type and then distinct-by-Id to guarantee uniqueness.
-        var all = new List<Habit>();
-        // Load rows that have TargetCount column too (as CountableHabit)
-        var countableRows = await _connection.Table<CountableHabit>().ToListAsync();
-        all.AddRange(countableRows);
-
-        // Load the rest as plain Habit (these rows will have TargetCount=0 by default when read as CountableHabit)
-        var baseRows = await _connection.Table<Habit>().ToListAsync();
-        all.AddRange(baseRows);
-
-        // Distinct by Id to eliminate duplicates
-        var distinct = all
-            .GroupBy(h => h.Id)
-            .Select(g => g.First())
+        // Now that we've unified the classes, we can just query the Habit table
+        var habits = await _connection.Table<Habit>()
             .OrderBy(h => h.Id)
-            .ToList();
-        return distinct;
+            .ToListAsync();
+            
+        return habits;
     }
 
     public async Task<int> SaveHabitAsync(Habit habit, bool isImport = false)
     {
         System.Diagnostics.Debug.WriteLine($"Attempting to save habit: {habit.Name}, ID: {habit.Id}, IsImport: {isImport}");
-        if (habit is CountableHabit countable)
-        {
-            return await UpdateOrInsertCountableHabitAsync(countable, isImport);
-        }
+        // if (habit is CountableHabit countable)
+        // {
+        //     return await UpdateOrInsertCountableHabitAsync(countable, isImport);
+        // }
         return await UpdateOrInsertHabitAsync(habit, isImport);
     }
     
@@ -125,14 +113,14 @@ public class DatabaseService
         {
             await _connection.DeleteAsync(habit);
         }
-        else
-        {
-            var countableHabit = await _connection.FindAsync<CountableHabit>(id);
-            if (countableHabit != null)
-            {
-                await _connection.DeleteAsync(countableHabit);
-            }
-        }
+        // else
+        // {
+        //     var countableHabit = await _connection.FindAsync<CountableHabit>(id);
+        //     if (countableHabit != null)
+        //     {
+        //         await _connection.DeleteAsync(countableHabit);
+        //     }
+        // }
     }
 
     // public async Task<HabitRecord> GetHabitRecordAsync(int habitId, DateTime date)
@@ -189,23 +177,23 @@ public class DatabaseService
         }
     }
 
-    private async Task<int> UpdateOrInsertCountableHabitAsync(CountableHabit countable, bool isImport = false)
-    {
-        if (isImport)
-        {
-            var result = await _connection.InsertOrReplaceAsync(countable);
-            System.Diagnostics.Debug.WriteLine($"Habit save result (import): rows affected = {result}");
-            return result;
-        }
-        else
-        {
-            if (countable.Id != 0)
-            {
-                return await _connection.UpdateAsync(countable);
-            }
-            return await _connection.InsertAsync(countable);
-        }
-    }
+    // private async Task<int> UpdateOrInsertCountableHabitAsync(CountableHabit countable, bool isImport = false)
+    // {
+    //     if (isImport)
+    //     {
+    //         var result = await _connection.InsertOrReplaceAsync(countable);
+    //         System.Diagnostics.Debug.WriteLine($"Habit save result (import): rows affected = {result}");
+    //         return result;
+    //     }
+    //     else
+    //     {
+    //         if (countable.Id != 0)
+    //         {
+    //             return await _connection.UpdateAsync(countable);
+    //         }
+    //         return await _connection.InsertAsync(countable);
+    //     }
+    // }
 
     /// <summary>
     /// Permanently deletes all application data by dropping tables and recreating them.
@@ -213,7 +201,7 @@ public class DatabaseService
     public async Task ResetDatabaseAsync()
     {
         await _connection.DropTableAsync<Habit>();
-        await _connection.DropTableAsync<CountableHabit>();
+        // await _connection.DropTableAsync<CountableHabit>();
         await _connection.DropTableAsync<HabitRecord>();
         await InitializeAsync();
     }
