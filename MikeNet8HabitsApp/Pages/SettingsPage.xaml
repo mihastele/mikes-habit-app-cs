@@ -7,7 +7,7 @@
         <VerticalStackLayout Padding="20" Spacing="16">
             <Label Text="Data" FontAttributes="Bold" />
             <Button Text="Export habits and records" Clicked="OnExportClicked" />
-            <Button Text="Import habits and records (merge)" Clicked="OnImportClicked" />
+            <!-- <Button Text="Import habits and records (merge)" Clicked="OnImportClicked" /> -->
             
             <Label Margin="0,30,0,0" Text="Threshold % for successful day" FontAttributes="Bold" />
             <Slider x:Name="ThresholdSlider" Minimum="0" Maximum="100" ValueChanged="OnThresholdChanged" />

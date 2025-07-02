@@ -111,12 +111,16 @@ namespace MikeNet8HabitsApp
         protected override async void OnAppearing()
         {
             base.OnAppearing();
+
+            // Ensure database is initialized
             if (_db != null)
             {
                 await _db.InitializeAsync();
             }
 
-            await LoadHabitsAsync();
+            // Always refresh habits for the currently selected date so IsCompleted
+            // is determined solely by HabitRecords, not stale data persisted in Habit table
+            LoadHabitsForDate(_currentDate);
         }
 
         private async void OnHabitCheckedChanged(object sender, CheckedChangedEventArgs e)

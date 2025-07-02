@@ -12,7 +12,10 @@ public class Habit : INotifyPropertyChanged
 
     public string Name { get; set; }
     public string Description { get; set; }
+    
     private bool _isCompleted;
+    
+    [Ignore]
     public bool IsCompleted 
     { 
         get => _isCompleted; 
