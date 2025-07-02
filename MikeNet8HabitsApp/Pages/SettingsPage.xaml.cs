@@ -1,4 +1,6 @@
 using Microsoft.Maui.Controls;
+using System.IO;
+using System.Linq;
 using MikeNet8HabitsApp.Services;
 
 namespace MikeNet8HabitsApp.Pages;
@@ -32,7 +34,7 @@ public partial class SettingsPage : ContentPage
 
     private async void OnImportClicked(object sender, EventArgs e)
     {
-        // In production use FilePicker; here we assume latest export file.
+        // Merge import – keeps existing data, skips duplicates
         string latest = Directory.GetFiles(FileSystem.AppDataDirectory, "habits_export_*.json").OrderByDescending(f => f).FirstOrDefault();
         if (latest == null)
         {
@@ -40,6 +42,30 @@ public partial class SettingsPage : ContentPage
             return;
         }
         await _settings.ImportAsync(_db, latest);
-        await DisplayAlert("Import", "Import finished", "OK");
+        await DisplayAlert("Import", "Merge import finished", "OK");
+    }
+
+    private async void OnDeleteDbClicked(object sender, EventArgs e)
+    {
+        bool confirm = await DisplayAlert("Delete all data", "Are you sure you want to delete ALL data? This cannot be undone.", "Delete", "Cancel");
+        if (!confirm) return;
+        await _db.ResetDatabaseAsync();
+        await DisplayAlert("Delete", "Database reset completed.", "OK");
+    }
+
+    private async void OnOverwriteImportClicked(object sender, EventArgs e)
+    {
+        string latest = Directory.GetFiles(FileSystem.AppDataDirectory, "habits_export_*.json").OrderByDescending(f => f).FirstOrDefault();
+        if (latest == null)
+        {
+            await DisplayAlert("Import", "No export file found.", "OK");
+            return;
+        }
+        bool confirm = await DisplayAlert("Overwrite Import", "This will delete current data and import from the selected file. Continue?", "Import", "Cancel");
+        if (!confirm) return;
+
+        await _db.ResetDatabaseAsync();
+        await _settings.ImportAsync(_db, latest);
+        await DisplayAlert("Import", "Overwrite import finished", "OK");
     }
 }

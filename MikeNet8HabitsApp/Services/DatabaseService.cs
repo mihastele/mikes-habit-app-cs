@@ -10,11 +10,12 @@ namespace MikeNet8HabitsApp.Services;
 public class DatabaseService
 {
     private readonly SQLiteAsyncConnection _connection;
+    private readonly string _databasePath;
 
     public DatabaseService()
     {
-        var databasePath = Path.Combine(FileSystem.AppDataDirectory, "habits.db3");
-        _connection = new SQLiteAsyncConnection(databasePath);
+        _databasePath = Path.Combine(FileSystem.AppDataDirectory, "habits.db3");
+        _connection = new SQLiteAsyncConnection(_databasePath);
     }
 
     public async Task InitializeAsync()
@@ -173,5 +174,16 @@ public class DatabaseService
         if (habit.Id != 0)
             return await _connection.UpdateAsync(habit);
         return await _connection.InsertAsync(habit);
+    }
+
+    /// <summary>
+    /// Permanently deletes all application data by dropping tables and recreating them.
+    /// </summary>
+    public async Task ResetDatabaseAsync()
+    {
+        await _connection.DropTableAsync<Habit>();
+        await _connection.DropTableAsync<CountableHabit>();
+        await _connection.DropTableAsync<HabitRecord>();
+        await InitializeAsync();
     }
 }
