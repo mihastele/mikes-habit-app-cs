@@ -52,13 +52,14 @@ public class DatabaseService
         return result;
     }
 
-    public async Task<int> SaveHabitAsync(Habit habit)
+    public async Task<int> SaveHabitAsync(Habit habit, bool isImport = false)
     {
+        System.Diagnostics.Debug.WriteLine($"Attempting to save habit: {habit.Name}, ID: {habit.Id}, IsImport: {isImport}");
         if (habit is CountableHabit countable)
         {
-            return await UpdateOrInsertCountableHabitAsync(countable);
+            return await UpdateOrInsertCountableHabitAsync(countable, isImport);
         }
-        return await UpdateOrInsertHabitAsync(habit);
+        return await UpdateOrInsertHabitAsync(habit, isImport);
     }
     
     public async Task<HabitRecord> GetHabitRecordAsync(int habitId, DateTime date)
@@ -162,18 +163,40 @@ public class DatabaseService
         return await _connection.Table<HabitRecord>().ToListAsync();
     }
 
-    private async Task<int> UpdateOrInsertCountableHabitAsync(CountableHabit countable)
+    private async Task<int> UpdateOrInsertHabitAsync(Habit habit, bool isImport = false)
     {
-        if (countable.Id != 0)
-            return await _connection.UpdateAsync(countable);
-        return await _connection.InsertAsync(countable);
+        if (isImport)
+        {
+            var result = await _connection.InsertOrReplaceAsync(habit);
+            System.Diagnostics.Debug.WriteLine($"Habit save result (import): rows affected = {result}");
+            return result;
+        }
+        else
+        {
+            if (habit.Id != 0)
+            {
+                return await _connection.UpdateAsync(habit);
+            }
+            return await _connection.InsertAsync(habit);
+        }
     }
 
-    private async Task<int> UpdateOrInsertHabitAsync(Habit habit)
+    private async Task<int> UpdateOrInsertCountableHabitAsync(CountableHabit countable, bool isImport = false)
     {
-        if (habit.Id != 0)
-            return await _connection.UpdateAsync(habit);
-        return await _connection.InsertAsync(habit);
+        if (isImport)
+        {
+            var result = await _connection.InsertOrReplaceAsync(countable);
+            System.Diagnostics.Debug.WriteLine($"Habit save result (import): rows affected = {result}");
+            return result;
+        }
+        else
+        {
+            if (countable.Id != 0)
+            {
+                return await _connection.UpdateAsync(countable);
+            }
+            return await _connection.InsertAsync(countable);
+        }
     }
 
     /// <summary>

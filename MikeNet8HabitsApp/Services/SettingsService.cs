@@ -55,8 +55,17 @@ public class SettingsService
         {
             foreach (var habitElem in h.EnumerateArray())
             {
-                var habit = JsonSerializer.Deserialize<Habit>(habitElem); // base class covers both derived types thanks to SQLite attrs
-                await db.SaveHabitAsync(habit);
+                // Determine habit type based on serialized properties
+                Habit habit;
+                if (habitElem.TryGetProperty("IsCountable", out var countableProp) && countableProp.GetBoolean())
+                {
+                    habit = JsonSerializer.Deserialize<CountableHabit>(habitElem.GetRawText());
+                }
+                else
+                {
+                    habit = JsonSerializer.Deserialize<Habit>(habitElem.GetRawText());
+                }
+                await db.SaveHabitAsync(habit, true); // Import mode
             }
         }
         if (doc.TryGetProperty("HabitRecords", out var r))
