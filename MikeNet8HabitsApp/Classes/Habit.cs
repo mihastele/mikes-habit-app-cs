@@ -54,10 +54,35 @@ public class Habit : INotifyPropertyChanged
     public int Streak { get; set; }
 
     // Countable habit properties
-    public bool IsCountable { get; set; } = false;
-    public int TargetCount { get; set; } = 0;
-    
+    private bool _isCountable = false;
+    private int _targetCount = 0;
     private int _currentCount = 0;
+
+    public bool IsCountable 
+    { 
+        get => _isCountable;
+        set
+        {
+            if (_isCountable != value)
+            {
+                _isCountable = value;
+                OnPropertyChanged(nameof(IsCountable));
+            }
+        }
+    }
+
+    public int TargetCount 
+    { 
+        get => _targetCount;
+        set
+        {
+            if (_targetCount != value)
+            {
+                _targetCount = value;
+                OnPropertyChanged(nameof(TargetCount));
+            }
+        }
+    }
 
     [Ignore] // Not persisted - derived from HabitRecord
     public int CurrentCount
@@ -82,8 +107,8 @@ public class Habit : INotifyPropertyChanged
         if (newCount >= 0 && newCount <= TargetCount)
         {
             CurrentCount = newCount;
+            // Update completion status based on count
             IsCompleted = (CurrentCount >= TargetCount);
-            OnPropertyChanged(nameof(CurrentCount));
             OnPropertyChanged(nameof(IsCompleted));
         }
     }

@@ -25,46 +25,61 @@
                 <DataTemplate>
                     <Grid Padding="10"
                           RowDefinitions="Auto,*"
-                          ColumnDefinitions="*">
+                          ColumnDefinitions="Auto,*,Auto">
 
-                        <!-- Horizontal controls (check box, label, button, etc.) -->
-                        <HorizontalStackLayout Grid.Row="0"
-                                               Spacing="10"
-                                               Padding="5"
-                                               HorizontalOptions="Start"
-                                               VerticalOptions="Center">
+                        <!-- Left section: Checkbox and Done label -->
+                        <HorizontalStackLayout Grid.Row="0" Grid.Column="0"
+                                           Spacing="5"
+                                           VerticalOptions="Center">
                             <CheckBox IsChecked="{Binding IsCompleted}"
-                                      VerticalOptions="Center"
-                                      CheckedChanged="OnHabitCheckedChanged" />
+                                    VerticalOptions="Center"
+                                    CheckedChanged="OnHabitCheckedChanged" />
                             <Label Text="Done"
-                                   FontSize="12"
-                                   VerticalOptions="Center" />
-
-                            <Button Text="+"
-                                    x:Name="IncrementButton"
-                                    WidthRequest="40"
-                                    HeightRequest="40"
-                                    Margin="0,0,5,0"
-                                    Clicked="OnIncrementCountClicked"
-                                    IsVisible="{Binding IsCountable}" />
-                            <Label Text="{Binding CurrentCount, StringFormat='{0} / '}"
-                                   VerticalOptions="Center"
-                                   IsVisible="{Binding IsCountable}" />
-
-                            <Label Text="{Binding TargetCount}"
-                                   FontSize="14"
-                                   TextColor="Orange"
-                                   VerticalOptions="Center"
-                                   IsVisible="{Binding IsCountable}" />
-                            <Button Text="Delete" Clicked="OnDeleteHabitClicked" IsVisible="True" BackgroundColor="Red" TextColor="White" />
+                                 FontSize="12"
+                                 VerticalOptions="Center" />
                         </HorizontalStackLayout>
+
+                        <!-- Center section: Counter -->
+                        <HorizontalStackLayout Grid.Row="0" Grid.Column="1"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           Spacing="5">
+                            <Button Text="+"
+                                  x:Name="IncrementButton"
+                                  WidthRequest="40"
+                                  HeightRequest="40"
+                                  Clicked="OnIncrementCountClicked"
+                                  IsVisible="{Binding IsCountable}" />
+                            <Label Text="{Binding CurrentCount, StringFormat='{0} / '}"
+                                 VerticalOptions="Center"
+                                 IsVisible="{Binding IsCountable}"
+                                 FontSize="14"
+                                 TextColor="{StaticResource Primary}" />
+                            <Label Text="{Binding TargetCount}"
+                                 FontSize="14"
+                                 TextColor="Orange"
+                                 VerticalOptions="Center"
+                                 IsVisible="{Binding IsCountable}" />
+                        </HorizontalStackLayout>
+
+                        <!-- Right section: Delete button -->
+                        <Button Grid.Row="0" Grid.Column="2"
+                              Text="Delete"
+                              Clicked="OnDeleteHabitClicked"
+                              BackgroundColor="Red"
+                              TextColor="White"
+                              HorizontalOptions="End"
+                              VerticalOptions="Center" />
 
                         <!-- Main habit information area -->
                         <Frame Grid.Row="1"
+                               Grid.Column="0"
+                               Grid.ColumnSpan="3"
                                CornerRadius="8"
                                Padding="10"
                                HasShadow="True"
-                               BackgroundColor="White">
+                               BackgroundColor="White"
+                               HorizontalOptions="FillAndExpand">
                             <StackLayout Spacing="5"
                                          VerticalOptions="FillAndExpand">
                                 <Label Text="{Binding Name}"
