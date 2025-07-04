@@ -30,7 +30,8 @@
                         <!-- Left section: Checkbox and Done label -->
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="0"
                                            Spacing="5"
-                                           VerticalOptions="Center">
+                                           VerticalOptions="Center"
+                                           Margin="0,5,0,5">
                             <CheckBox IsChecked="{Binding IsCompleted}"
                                     VerticalOptions="Center"
                                     CheckedChanged="OnHabitCheckedChanged" />
@@ -43,7 +44,8 @@
                         <HorizontalStackLayout Grid.Row="0" Grid.Column="1"
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center"
-                                           Spacing="5">
+                                           Spacing="5"
+                                           Margin="0,5,0,5">
                             <Button Text="+"
                                   x:Name="IncrementButton"
                                   WidthRequest="40"
@@ -69,7 +71,8 @@
                               BackgroundColor="Red"
                               TextColor="White"
                               HorizontalOptions="End"
-                              VerticalOptions="Center" />
+                              VerticalOptions="Center"
+                              Margin="0,5,0,5"/>
 
                         <!-- Main habit information area -->
                         <Frame Grid.Row="1"
