@@ -85,11 +85,18 @@ namespace MikeNet8HabitsApp
                 foreach (var habit in _habits)
                 {
                     var record = await _db.GetHabitRecordAsync(habit.Id, date);
-                    // var firstRecord = await _db.DebugHabitRecordAsync();
-                    // DisplayAlert("Record", record?.Id + " " + record?.Date + " " + record?.IsCompleted, "OK");
-                    // DisplayAlert("Record present?", firstRecord?.Id + " " + firstRecord?.HabitId + " " + firstRecord?.Date + " " + firstRecord?.IsCompleted, "OK");
-                    habit.IsCompleted =
-                        record?.IsCompleted ?? false; // Set IsCompleted from HabitRecord or default to false
+                    
+                    if (habit.IsCountable)
+                    {
+                        // For countable habits, update count and completion status
+                        habit.CurrentCount = record?.Count ?? 0;
+                        habit.IsCompleted = record?.IsCompleted ?? false;
+                    }
+                    else
+                    {
+                        // For regular habits, just update completion status
+                        habit.IsCompleted = record?.IsCompleted ?? false;
+                    }
                 }
             }
             finally
@@ -131,34 +138,52 @@ namespace MikeNet8HabitsApp
             if (sender is CheckBox checkBox && checkBox.BindingContext is Habit habit)
             {
                 habit.IsCompleted = e.Value;
-                if (habit.IsCountable && !e.Value)
+                
+                if (habit.IsCountable)
                 {
-                    // Reset count when unchecking a countable habit
-                    habit.CurrentCount = 0;
+                    if (!e.Value)
+                    {
+                        // Reset count when unchecking a countable habit
+                        habit.CurrentCount = 0;
+                    }
+                    else if (habit.CurrentCount >= habit.TargetCount)
+                    {
+                        // If checking a completed countable habit, ensure it's marked as completed
+                        habit.IsCompleted = true;
+                    }
                 }
 
                 await _db.SaveHabitAsync(habit);
                 await UpdateHabitRecord(habit);
-                // var record = await _db.GetHabitRecordAsync(habit.Id, _currentDate);
-                // if (record == null)
-                // {
-                //     record = new HabitRecord { HabitId = habit.Id, Date = _currentDate, IsCompleted = habit.IsCompleted };
-                //     await _db.SaveHabitRecordAsync(record);
-                // }
-                // else
-                // {
-                //     record.IsCompleted = habit.IsCompleted;
-                //     await _db.SaveHabitRecordAsync(record);
-                // }
-                // await LoadHabitsAsync();  // Refresh UI
             }
         }
 
-        // private async void OnHomeClicked(object sender, EventArgs e)
-        // {
-        //     await Navigation.PushAsync(new MainPage());
-        //     Navigation.RemovePage(this);
-        // }
+        async Task UpdateHabitRecord(Habit habit)
+        {
+            // Ensure we're working with date-only
+            var dateForRecord = _currentDate.Date;
+
+            var record = await _db.GetHabitRecordAsync(habit.Id, dateForRecord);
+            
+            if (record == null)
+            {
+                record = new HabitRecord
+                {
+                    HabitId = habit.Id,
+                    Date = dateForRecord, // Store only the date part
+                    IsCompleted = habit.IsCompleted,
+                    Count = habit.CurrentCount
+                };
+                await _db.SaveHabitRecordAsync(record);
+            }
+            else
+            {
+                record.IsCompleted = habit.IsCompleted; // Update existing record
+                record.Count = habit.CurrentCount;
+                await _db.SaveHabitRecordAsync(record);
+            }
+        }
+
         private async void OnAddHabitClicked(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new Pages.AddHabitPage());
@@ -211,44 +236,7 @@ namespace MikeNet8HabitsApp
                 // Save changes
                 await _db.SaveHabitRecordAsync(record);
                 await _db.SaveHabitAsync(habit);
-                
-                // Update the UI
-                OnPropertyChanged(nameof(habit.IsCompleted));
-                OnPropertyChanged(nameof(habit.CurrentCount));
             }
-        }
-
-        async Task UpdateHabitRecord(Habit habit)
-        {
-            // Ensure we're working with date-only
-            var dateForRecord = _currentDate.Date;
-
-            var record = await _db.GetHabitRecordAsync(habit.Id, dateForRecord);
-            // DisplayAlert("Record", record?.Id + " " + record?.Date + " " + record?.IsCompleted, "OK");
-            
-            // // Debug the record we found (or didn't find)
-            // string recordInfo = record == null 
-            //     ? "No existing record found" 
-            //     : $"Found record: ID={record.Id}, Date={record.Date:yyyy-MM-dd}, IsCompleted={record.IsCompleted}";
-            // await DisplayAlert("Record Info", recordInfo, "OK");
-            
-            if (record == null)
-            {
-                record = new HabitRecord
-                {
-                    HabitId = habit.Id,
-                    Date = dateForRecord, // Store only the date part
-                    IsCompleted = habit.IsCompleted
-                };
-                await _db.SaveHabitRecordAsync(record);
-            }
-            else
-            {
-                record.IsCompleted = habit.IsCompleted; // Update existing record
-                await _db.SaveHabitRecordAsync(record);
-            }
-            
-            // await LoadHabitsAsync();
         }
 
         private async void OnDeleteHabitClicked(object sender, EventArgs e)

@@ -57,8 +57,21 @@ public class Habit : INotifyPropertyChanged
     public bool IsCountable { get; set; } = false;
     public int TargetCount { get; set; } = 0;
     
+    private int _currentCount = 0;
+
     [Ignore] // Not persisted - derived from HabitRecord
-    public int CurrentCount { get; set; } = 0;
+    public int CurrentCount
+    {
+        get => _currentCount;
+        set
+        {
+            if (_currentCount != value)
+            {
+                _currentCount = value;
+                OnPropertyChanged(nameof(CurrentCount));
+            }
+        }
+    }
 
     // Helper method for countable habits
     public void UpdateCount(int change)
