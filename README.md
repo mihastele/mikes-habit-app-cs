@@ -47,7 +47,7 @@ A modern, cross-platform habit tracking application built with .NET MAUI that he
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/MikeNet8HabitsApp.git
+   git clone https://github.com/mihastele/mikes-habit-app-cs
    cd MikeNet8HabitsApp
    ```
 
